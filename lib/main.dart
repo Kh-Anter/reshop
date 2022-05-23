@@ -5,6 +5,7 @@ import 'package:reshop/providers/dummyData.dart';
 import 'package:reshop/theme.dart';
 
 import './screens/home.dart';
+import './screens/splash_screen.dart';
 import './size_config.dart';
 import './routes.dart';
 
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme(),
-      initialRoute: Home.routeName,
+      initialRoute: SplashScreen.routeName,
       routes: routes,
     );
   }

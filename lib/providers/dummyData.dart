@@ -345,6 +345,27 @@ Package Included:
             "High quality material ensures maximum comfort Suitable for various sports activities Antimicrobial treatment fights offensive odors and bacterial growth."),
   ];
 
+  List<Map<String, String>> splashScreen = [
+    {
+      "image": "assets/images/onboarding/onboarding1.png",
+      "title": "Buy whatever you want ",
+      "subtitle":
+          " The biggest online shop so you can find what are you looking for "
+    },
+    {
+      "image": "assets/images/onboarding/onboarding2.png",
+      "title": "Fastest Delivery service",
+      "subtitle":
+          " A wide country branches to give you the best delivery service "
+    },
+    {
+      "image": "assets/images/onboarding/onboarding3.png",
+      "title": "Find Your Perfect Offers",
+      "subtitle":
+          "The biggest online shop so you can find what are you looking for"
+    }
+  ];
+
   List homePageView = [
     "assets/images/carousel_card1.png",
     "assets/images/carousel_card2.png",

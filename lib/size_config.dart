@@ -12,11 +12,18 @@ class SizeConfig {
     screenWidth = _mediaQueryData.size.width;
     screenHeight = _mediaQueryData.size.height;
     orientation = _mediaQueryData.orientation;
-    print("------------------------- $orientation ----------------");
   }
 
   get getWidth {
-    return screenWidth;
+    if (orientation.name == "portrait") {
+      return screenWidth;
+    } else {
+      return screenWidth / 1.5;
+    }
+  }
+
+  get getHeight {
+    return screenHeight;
   }
 
   get getOriantation {

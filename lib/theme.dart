@@ -3,13 +3,14 @@ import './constants.dart';
 
 ThemeData theme() {
   return ThemeData(
-    // primaryColor: myPrimaryColor,
-    primarySwatch: Colors.red,
-    scaffoldBackgroundColor: Colors.white,
-    fontFamily: "SF-Pro-Display",
-    appBarTheme: appBarTheme(),
-    textTheme: textTheme(),
-  );
+      // primaryColor: myPrimaryColor,
+      primarySwatch: Colors.red,
+      scaffoldBackgroundColor: Colors.white,
+      fontFamily: "SF-Pro-Display",
+      appBarTheme: appBarTheme(),
+      textTheme: textTheme(),
+      elevatedButtonTheme:
+          ElevatedButtonThemeData(style: ElevatedButton.styleFrom()));
 }
 
 // InputDecorationTheme inputDecorationTheme() {
@@ -49,7 +50,3 @@ AppBarTheme appBarTheme() {
     ),
   );
 }
-/// change 
-/// 
-/// 
-///hhhh
