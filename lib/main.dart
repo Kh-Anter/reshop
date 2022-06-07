@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
+import 'package:reshop/providers/auth.dart';
 import 'package:reshop/providers/dummyData.dart';
+import 'package:reshop/screens/authentication/auth_screen.dart';
+import 'package:reshop/screens/authentication/email_verification.dart';
+import 'package:reshop/screens/authentication/forget_password.dart';
 import 'package:reshop/theme.dart';
 
 import './screens/home.dart';
@@ -12,9 +16,8 @@ import './routes.dart';
 void main() {
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(
-        create: ((_) => DummyData()),
-      )
+      ChangeNotifierProvider(create: ((_) => DummyData())),
+      ChangeNotifierProvider(create: ((_) => AuthProvider()))
     ],
     child: MyApp(),
   ));

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reshop/constants.dart';
+import 'package:reshop/screens/authentication/auth_screen.dart';
 import '../providers/dummyData.dart';
 import '../widgets/build_dot.dart';
 import '../size_config.dart';
@@ -18,6 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   SizeConfig _size = SizeConfig();
   DummyData _dummyData = DummyData();
   int _index = 0;
+  String _btnText = "Next";
   @override
   Widget build(BuildContext context) {
     _size.init(context);
@@ -66,13 +68,26 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: _size.getProportionateScreenWidth(120),
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(primary: myPrimaryColor),
-                    child: Text("Next"),
+                    child: Text(_btnText),
                     onPressed: () {
                       if (_pageController.page < 2) {
+                        if (_pageController.page == 1 && _btnText == "Next") {
+                          setState(() {
+                            _btnText = "Shop now";
+                          });
+                        }
                         _pageController.nextPage(
                             duration: myAnimationDuration,
                             curve: Curves.decelerate);
+                      } else {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AuthScreen()),
+                            ModalRoute.withName("/"));
                       }
+
+                      //  System.out.printIn("");
                     })),
             Spacer(
               flex: 1,
