@@ -46,7 +46,9 @@ class _AuthScreenState extends State<AuthScreen> {
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 TextButton(
                     onPressed: () {
-                      authProvider.changeStatus();
+                      if (!authProvider.signIn) {
+                        authProvider.changeStatus();
+                      }
                     },
                     child: Text(
                       "Sign in",
@@ -54,7 +56,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     )),
                 TextButton(
                   onPressed: () {
-                    authProvider.changeStatus();
+                    if (authProvider.signIn) {
+                      authProvider.changeStatus();
+                    }
                   },
                   child: Text("Sign up",
                       style: authProvider.signIn ? unselected : selected),

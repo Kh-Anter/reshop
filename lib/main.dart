@@ -6,6 +6,8 @@ import 'package:reshop/providers/dummyData.dart';
 import 'package:reshop/screens/authentication/auth_screen.dart';
 import 'package:reshop/screens/authentication/email_verification.dart';
 import 'package:reshop/screens/authentication/forget_password.dart';
+import 'package:reshop/screens/categories_screen.dart';
+import './screens/product_details.dart';
 import 'package:reshop/theme.dart';
 
 import './screens/home.dart';
@@ -30,7 +32,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme(),
-      initialRoute: SplashScreen.routeName,
+      initialRoute: Home.routeName, //SplashScreen.routeName,
       routes: routes,
     );
   }

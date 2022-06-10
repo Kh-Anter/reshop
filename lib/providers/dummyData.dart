@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:reshop/models/product.dart';
 
 import '../models/product.dart';
@@ -7,6 +8,28 @@ import '../enums.dart';
 class DummyData with ChangeNotifier {
   List bestSeller = [];
   List lifeStyle = [];
+  int currentPageView = 0;
+  int bottomNavigationBar = 0;
+  //AppBar customAppBar=null;
+
+  void changeFav(id) {
+    myProducts.forEach((element) {
+      if (element.id == id) {
+        element.isFav = !element.isFav;
+      }
+    });
+    notifyListeners();
+  }
+
+  void changeBottonNavigationBar({int newValue}) {
+    bottomNavigationBar = newValue;
+    notifyListeners();
+  }
+
+  void changePageview(int newValue) {
+    currentPageView = newValue;
+    notifyListeners();
+  }
 
   List<Product> myProducts = [
     Product(
@@ -385,7 +408,6 @@ Package Included:
   ];
 
   getBestSellers() {
-    print("-------------heeeeeeeeeeeeeeeeeeerrrrrre-eee--------");
     myProducts.sort(((a, b) => a.sellCount.compareTo(b.sellCount)));
     int lengthOfBestSellers = (myProducts.length / 3).ceil();
     int index = myProducts.length - lengthOfBestSellers;

@@ -7,6 +7,7 @@ import 'package:reshop/constants.dart';
 import 'package:reshop/providers/auth.dart';
 import 'package:reshop/screens/authentication/auth_screen.dart';
 import 'package:reshop/screens/authentication/forget_password.dart';
+import 'package:reshop/screens/home.dart';
 import 'package:reshop/size_config.dart';
 import './mytextfield.dart';
 
@@ -104,10 +105,16 @@ class _SigninWidgetState extends State<SigninWidget> {
                         setState(() {
                           passError = "";
                           emailError = "";
+                          if (authProvider.email_ctr.text ==
+                                  "khaledanter0@gmail.com" &&
+                              authProvider.password_ctr.text == "123456") {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Home()));
+                          }
                         });
-                        if (_globalKey.currentState.validate()) {
-                          print("------------done");
-                        }
+                        if (_globalKey.currentState.validate()) {}
                       },
                       child: Text(
                         "Sign in",

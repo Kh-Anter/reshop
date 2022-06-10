@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/screens/authentication/auth_screen.dart';
 import '../providers/dummyData.dart';
@@ -17,11 +18,35 @@ class _SplashScreenState extends State<SplashScreen> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
   SizeConfig _size = SizeConfig();
-  DummyData _dummyData = DummyData();
   int _index = 0;
   String _btnText = "Next";
   @override
   Widget build(BuildContext context) {
+    var _dummyData = Provider.of<DummyData>(context);
+    switch (_currentPage) {
+      case 0:
+        {
+          setState(() {
+            _btnText = "Next";
+          });
+        }
+        break;
+      case 1:
+        {
+          setState(() {
+            _btnText = "Next";
+          });
+        }
+        break;
+      case 2:
+        {
+          setState(() {
+            _btnText = "Shop now";
+          });
+        }
+        break;
+    }
+
     _size.init(context);
     return Scaffold(
       body: SafeArea(
@@ -45,12 +70,13 @@ class _SplashScreenState extends State<SplashScreen> {
                     onPageChanged: (value) {
                       setState(() {
                         _currentPage = value;
+                        _dummyData.changePageview(value);
                       });
                     },
                   ),
                 ),
                 SizedBox(height: 20),
-                BuildDot().buildDot(_currentPage)
+                BuildDot(length: 3),
               ]),
             ),
             Container(
@@ -65,17 +91,21 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             Spacer(flex: 1),
             Container(
-                width: _size.getProportionateScreenWidth(120),
+                width: _size.getProportionateScreenWidth(170),
+                height: _size.getProportionateScreenHeight(60),
                 child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(primary: myPrimaryColor),
-                    child: Text(_btnText),
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(myPrimaryColor),
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10))),
+                    ),
+                    child: Text(
+                      _btnText,
+                      style: TextStyle(fontSize: 18),
+                    ),
                     onPressed: () {
-                      if (_pageController.page < 2) {
-                        if (_pageController.page == 1 && _btnText == "Next") {
-                          setState(() {
-                            _btnText = "Shop now";
-                          });
-                        }
+                      if (_currentPage < 2) {
                         _pageController.nextPage(
                             duration: myAnimationDuration,
                             curve: Curves.decelerate);
@@ -86,8 +116,6 @@ class _SplashScreenState extends State<SplashScreen> {
                                 builder: (context) => const AuthScreen()),
                             ModalRoute.withName("/"));
                       }
-
-                      //  System.out.printIn("");
                     })),
             Spacer(
               flex: 1,

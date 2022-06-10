@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/dummyData.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/models/product.dart';
+import 'package:reshop/screens/product_details.dart';
 
 class ProductCart extends StatelessWidget {
   final Product product;
@@ -8,12 +11,18 @@ class ProductCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var _dummyData = Provider.of<DummyData>(context);
+
     return Padding(
         padding: EdgeInsets.only(left: 3.0, right: 3.0),
         child: InkWell(
             onTap: () {
-              // Navigator.push(context,
-              //     MaterialPageRoute(builder: (context) => ProductDetails(id)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ProductDetails(
+                            productId: product.id,
+                          )));
             },
             child: Container(
                 decoration: BoxDecoration(
@@ -34,7 +43,7 @@ class ProductCart extends StatelessWidget {
                           )),
                           child: IconButton(
                               onPressed: () {
-                                // provider2.changeFav(id);
+                                _dummyData.changeFav(product.id);
                               },
                               icon: product.isFav
                                   ? const Icon(
