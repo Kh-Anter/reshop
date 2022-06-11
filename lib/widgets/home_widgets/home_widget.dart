@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/constants.dart';
+import 'package:reshop/screens/category_screen.dart';
 
 import '../product_card.dart';
 import '../build_dot.dart';
@@ -51,17 +52,19 @@ class _HomeWidgetState extends State<HomeWidget> {
         ),
         seeMore(text: "Categories"),
         Container(
-            height: 90,
+            height: 70,
             alignment: Alignment.center,
-            child: GridView.count(
-              crossAxisCount: 1,
-              childAspectRatio: 1.2,
+            child: ListView(
               scrollDirection: Axis.horizontal,
               children: List.generate(
                   provider.categories.length,
-                  (index) => buildCategories(
-                      image: provider.categories[index]["image"].toString(),
-                      text: provider.categories[index]["text"])),
+                  (index) => Container(
+                        padding: EdgeInsets.only(left: 10, right: 10),
+                        child: buildCategories(
+                            image:
+                                provider.categories[index]["image"].toString(),
+                            text: provider.categories[index]["text"]),
+                      )),
             )),
         seeMore(text: "Best Sellers"),
         homeProducts(category: provider.getBestSellers().toList()),
@@ -89,23 +92,32 @@ class _HomeWidgetState extends State<HomeWidget> {
         ));
   }
 
-  Column buildCategories({image, text}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Container(
-          child: Image.asset(image),
-          height: 50,
-          width: 50,
-        ),
-        SizedBox(
-          height: 1,
-        ),
-        Text(
-          text,
-          style: TextStyle(color: Colors.black),
-        )
-      ],
+  Widget buildCategories({image, text}) {
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, CategoryScreen.routeName, arguments: text);
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.grey),
+                borderRadius: BorderRadius.circular(10)),
+            padding: EdgeInsets.all(7),
+            child: Image.asset(image),
+            height: 50,
+            width: 50,
+          ),
+          SizedBox(
+            height: 1,
+          ),
+          Text(
+            text,
+            style: TextStyle(color: Colors.black),
+          )
+        ],
+      ),
     );
   }
 

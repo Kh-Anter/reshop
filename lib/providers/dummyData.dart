@@ -130,6 +130,7 @@ Reduces dark spots and lightens the skin."""),
         sellCount: 5,
         title: "Galaxy Z Fold 3 , 128 GB , Phantom Black",
         category: Categories.Electronics,
+        subCat: "Smart Phones",
         price: 7000,
         isFav: false,
         images: [
@@ -148,6 +149,7 @@ Multiple Windows Get More Done: Start working smarter not harder with three mult
         sellCount: 6,
         title: "beats solo 3 wireless , Black",
         category: Categories.Electronics,
+        subCat: "Accessories",
         price: 599,
         isFav: true,
         images: [
@@ -162,6 +164,7 @@ Multiple Windows Get More Done: Start working smarter not harder with three mult
         sellCount: 19,
         title: "Apple iPhone 12 128GB Blue",
         category: Categories.Electronics,
+        subCat: "Smart Phones",
         price: 14000,
         isFav: true,
         images: [
@@ -181,6 +184,7 @@ Advanced dual-camera system with 12MP Ultra Wide and Wide cameras; Night mode, D
         title:
             "Apple iPhone 13 Pro Max with FaceTime - 256GB, 6GB RAM, 4G LTE, Sierra Blue, Single SIM & E-SIM",
         category: Categories.Electronics,
+        subCat: "Smart Phones",
         price: 23000,
         isFav: false,
         images: [
@@ -398,14 +402,44 @@ Package Included:
   List<Map> categories = [
     {
       "text": "Electronics",
-      "image": "assets/images/categories/electronics.png"
+      "image": "assets/images/categories/electronics_icon.png"
     },
-    {"text": "Beauty", "image": "assets/images/categories/electronics.png"},
-    {"text": "Home", "image": "assets/images/categories/electronics.png"},
-    {"text": "Fashion", "image": "assets/images/categories/electronics.png"},
-    {"text": "Sport", "image": "assets/images/categories/electronics.png"},
-    {"text": "Kitchen", "image": "assets/images/categories/electronics.png"},
+    {"text": "Beauty", "image": "assets/images/categories/beauty_icon2.png"},
+    {"text": "Home", "image": "assets/images/categories/home_icon1.png"},
+    {"text": "Fashion", "image": "assets/images/categories/fashion_icon1.png"},
+    {"text": "Sport", "image": "assets/images/categories/sport_icon.png"},
+    {"text": "Kitchen", "image": "assets/images/categories/kitchen_icon1.png"},
   ];
+
+  Map<String, List> subCategories = {
+    "Electronics": [
+      "All",
+      "Smart Phones",
+      "Tablets",
+      "Televisions",
+      "Labtops",
+      "Accessories"
+    ],
+    "Beauty": ["All", "Makeup", "Skin care", "Hair care"],
+    "Home": ["All", "Home decore", "Wall art", "Lighting", "Fans"],
+    "Fashion": [
+      "All",
+      "Man's fashion",
+      "Woman's fashion",
+      "Boy's fashion",
+      "Girl's fashion"
+    ],
+    "Sport": [
+      "All",
+      "Running",
+      "Water sport",
+      "Tennis sports",
+      "Golf",
+      "Winter sport",
+      "Other sports"
+    ],
+    "Kitchen": ["All", "Water coolers", "Filters", "Glasses", "Accessories"]
+  };
 
   getBestSellers() {
     myProducts.sort(((a, b) => a.sellCount.compareTo(b.sellCount)));
@@ -417,7 +451,6 @@ Package Included:
     for (int i = 0; i < index; i++) {
       lifeStyle.add(myProducts[i]);
     }
-
     for (index; index < myProducts.length; index++) {
       bestSeller.add(myProducts[index]);
     }
@@ -426,5 +459,28 @@ Package Included:
 
   getLifeStyle() {
     return lifeStyle;
+  }
+
+  getByCategory(String category) {
+    List<Product> productByCat = [];
+    for (int i = 0; i < myProducts.length; i++) {
+      if (myProducts[i].category.name == category) {
+        productByCat.add(myProducts[i]);
+      }
+    }
+    return productByCat;
+  }
+
+  getBySubCat(List all, String subCategor) {
+    List<Product> other = [];
+    var myAll = all;
+    for (int i = 0; i < all.length; i++) {
+      print("subcat ${myAll[i].subCat}");
+      if (all[i].subCat == subCategor) {
+        other.add(all[i]);
+      }
+    }
+    print("--------------hhhhhhh other length ${other.length}");
+    return other;
   }
 }

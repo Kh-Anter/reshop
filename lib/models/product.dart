@@ -5,6 +5,7 @@ class Product {
   int sellCount = 0;
   String title;
   Enum category;
+  String subCat;
   int price;
   bool isFav;
   List<String> images;
@@ -16,6 +17,7 @@ class Product {
       this.sellCount,
       this.title,
       this.category,
+      this.subCat,
       this.price,
       this.isFav,
       this.images,

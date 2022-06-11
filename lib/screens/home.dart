@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:flutter/rendering.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/enums.dart';
-import 'package:reshop/screens/categories_screen.dart';
 import 'package:reshop/size_config.dart';
+import 'package:reshop/widgets/home_widgets/categories_widget.dart';
 import 'package:reshop/widgets/product_card.dart';
 import '../providers/dummyData.dart';
 import '../widgets/build_dot.dart';
@@ -20,7 +20,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  AppBar customAppBar = AppBar();
   AppBar homeAppbar = AppBar(
     title: Container(
       width: 100,
@@ -44,14 +43,69 @@ class _HomeState extends State<Home> {
     ],
     elevation: 0,
   );
-  AppBar categoriesAppbar = AppBar();
+  AppBar customAppBar = AppBar(
+    title: Container(
+      width: 100,
+      height: 50,
+      child: Image.asset(
+        "assets/images/splash.png",
+      ),
+    ),
+    actions: [
+      TextButton.icon(
+        onPressed: () {},
+        label: Text(
+          "Search",
+          style: TextStyle(
+              color: mySecondTextColor,
+              fontSize: 14,
+              fontWeight: FontWeight.normal),
+        ),
+        icon: Icon(Icons.search, size: 20),
+      ),
+    ],
+    elevation: 0,
+  );
+  AppBar categoriesAppbar = AppBar(
+    title: Text(
+      "Categories",
+      style: TextStyle(
+        fontSize: 22,
+        color: Colors.black,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
+    elevation: 0,
+  );
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<DummyData>(context);
+    int _currentIndex = provider.bottomNavigationBar;
     SizeConfig _size = SizeConfig();
     _size.init(context);
     var _oriantation = _size.getOriantation;
+
+    switch (_currentIndex) {
+      case 0:
+        {
+          customAppBar = homeAppbar;
+        }
+        break;
+      case 1:
+        {
+          customAppBar = categoriesAppbar;
+        }
+        break;
+      case 2:
+        {
+          customAppBar = null;
+        }
+    }
+
+    onTap(index) {
+      provider.changeBottonNavigationBar(newValue: index);
+    }
 
     return Scaffold(
       appBar: customAppBar,
@@ -68,11 +122,8 @@ class _HomeState extends State<Home> {
         fixedColor: Colors.black,
         type: BottomNavigationBarType.fixed,
         landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-        currentIndex: provider.bottomNavigationBar,
-        onTap: (index) {
-          provider.changeBottonNavigationBar(newValue: index);
-          setState(() {});
-        },
+        currentIndex: _currentIndex,
+        onTap: onTap,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -102,26 +153,25 @@ class _HomeState extends State<Home> {
         child: Center(
           child: SizedBox(
             width: _size.getWidth - 20,
-            child: _homeBody(provider.bottomNavigationBar),
+            child: _homeBody(_currentIndex),
           ),
           //),
         ),
       )),
     );
   }
+}
 
-  _homeBody(num) {
-    switch (num) {
-      case 0:
-        {
-          return HomeWidget();
-        }
-        break;
-      case 1:
-        {
-          return CategoriesScreen();
-        }
-    }
-    return;
+_homeBody(num) {
+  switch (num) {
+    case 0:
+      {
+        return HomeWidget();
+      }
+      break;
+    case 1:
+      {
+        return CategoriesWidget();
+      }
   }
 }
