@@ -6,6 +6,7 @@ import 'package:reshop/widgets/product_card.dart';
 import '../providers/dummyData.dart';
 import '../constants.dart';
 import '../size_config.dart';
+import '../widgets/bottom_sheet_widget.dart';
 
 class CategoryScreen extends StatefulWidget {
   static const routeName = "/CategoryScreen";
@@ -21,7 +22,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
   var selectedBtn = 0;
   var all;
   var other;
+  var selectedItem = "aaa";
+  var dropdownValue = 'One';
   SizeConfig _size = SizeConfig();
+
   @override
   Widget build(BuildContext context) {
     var data = ModalRoute.of(context).settings.arguments;
@@ -38,13 +42,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 //  height: _size.getHeight,
                 child: Column(children: [
                   title(),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   subCategory(),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   myGridView(),
                 ]),
               ),
@@ -64,7 +64,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ),
       ),
       Spacer(),
-      IconButton(onPressed: () {}, icon: Icon(Icons.filter_alt_outlined)),
+      IconButton(
+          onPressed: () {
+            bottomSheet();
+          },
+          icon: Icon(Icons.filter_alt_outlined)),
       IconButton(onPressed: () {}, icon: Icon(Icons.filter_list))
     ]);
   }
@@ -177,6 +181,225 @@ class _CategoryScreenState extends State<CategoryScreen> {
       //     ),
       //   ),
       // ),
+    );
+  }
+
+  bottomSheet() {
+    return showModalBottomSheet(
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+        context: context,
+        builder: (context) {
+          return BottomSheetContent();
+        });
+  }
+}
+
+class BottomSheetContent extends StatefulWidget {
+  GlobalKey mykey;
+  BottomSheetContent({this.mykey, Key key}) : super(key: key);
+
+  @override
+  State<BottomSheetContent> createState() => _BottomSheetContentState();
+}
+
+class _BottomSheetContentState extends State<BottomSheetContent> {
+  SizeConfig _size = SizeConfig();
+  GlobalKey categoryKey = GlobalKey();
+  GlobalKey brandKey = GlobalKey();
+  RangeValues _rangeValues = RangeValues(3000, 20000);
+  var dropdownValue = 'One';
+  @override
+  Widget build(BuildContext context) {
+    _size.init(context);
+    return Container(
+      padding: EdgeInsets.all(20),
+      height: _size.getHeight - (_size.getHeight / 3),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Stack(alignment: Alignment.topCenter, children: [
+          Container(
+            width: _size.getWidth - 20,
+            alignment: Alignment.topCenter,
+            child: Text(
+              "Filters",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: EdgeInsets.all(5),
+              alignment: Alignment.topRight,
+              child: InkWell(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 25,
+                    color: Colors.black,
+                  )),
+            ),
+          )
+        ]),
+        SizedBox(height: 50),
+        Container(
+          height: 30,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Category",
+                style: TextStyle(
+                    fontSize: 18, color: Color.fromRGBO(0, 0, 0, 0.6)),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.arrow_forward_ios,
+                ),
+                iconSize: 17,
+                color: Color.fromRGBO(0, 0, 0, 0.5),
+              )
+            ],
+          ),
+        ),
+        Container(
+            alignment: Alignment.topLeft,
+            height: 40,
+            child: myDropDownButton([""], widget.mykey)),
+        Container(
+          height: 10,
+          width: _size.getWidth,
+          child: Divider(
+            endIndent: 15,
+            thickness: 1,
+            color: mySecondTextColor,
+          ),
+        ),
+        Container(
+          height: 30,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Brand",
+                style: TextStyle(
+                    fontSize: 18, color: Color.fromRGBO(0, 0, 0, 0.6)),
+              ),
+              IconButton(
+                onPressed: () {},
+                icon: Icon(Icons.arrow_forward_ios,
+                    color: Color.fromRGBO(0, 0, 0, 0.5)),
+                iconSize: 17,
+              )
+            ],
+          ),
+        ),
+        Container(
+            alignment: Alignment.topLeft,
+            height: 40,
+            child: myDropDownButton([""], widget.mykey)),
+        Container(
+          height: 10,
+          width: _size.getWidth,
+          child: Divider(
+            endIndent: 15,
+            thickness: 1,
+            color: mySecondTextColor,
+          ),
+        ),
+        Container(
+          height: 30,
+          child: Row(
+            children: const [
+              Text(
+                "Price",
+                style: TextStyle(
+                    fontSize: 18, color: Color.fromRGBO(0, 0, 0, 0.6)),
+              ),
+            ],
+          ),
+        ),
+        RangeSlider(
+          values: _rangeValues,
+          min: 0,
+          max: 50000,
+          divisions: 50,
+          labels: RangeLabels(_rangeValues.start.toInt().toString(),
+              _rangeValues.end.toInt().toString()),
+          onChanged: (newValue) {
+            setState(() {
+              _rangeValues = newValue;
+            });
+          },
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(_rangeValues.start.toInt().toString() + " L.E",
+                style: TextStyle(color: myPrimaryColor)),
+            Text(
+              _rangeValues.end.toInt().toString() + " L.E",
+              style: TextStyle(color: myPrimaryColor),
+            )
+          ],
+        ),
+        Spacer(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Container(
+                width: (_size.getWidth - 40) / 2,
+                height: 50,
+                child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      "Reset",
+                      style: TextStyle(fontSize: 17),
+                    ))),
+            Container(
+                width: (_size.getWidth - 40) / 2,
+                height: 50,
+                child: ElevatedButton(
+                    onPressed: () {},
+                    child: Text(
+                      "Apply",
+                      style: TextStyle(fontSize: 17),
+                    )))
+          ],
+        )
+      ]),
+    );
+  }
+
+  myDropDownButton(List items, GlobalKey key) {
+    return DropdownButton<String>(
+      underline: Container(
+        color: Colors.white,
+      ),
+      key: key,
+      value: dropdownValue,
+      icon: const Icon(null),
+      // elevation: 50,
+      isDense: true,
+      style: const TextStyle(color: Color.fromRGBO(0, 0, 0, 0.4), fontSize: 15),
+      onChanged: (String newValue) {
+        setState(() {
+          dropdownValue = newValue;
+        });
+      },
+      items: <String>['One', 'Two', 'Free', 'Four']
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child:
+              Padding(padding: EdgeInsets.only(left: 30), child: Text(value)),
+        );
+      }).toList(),
     );
   }
 }
