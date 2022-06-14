@@ -7,5 +7,6 @@ const myAnimationDuration = Duration(milliseconds: 400);
 const mySecondTextColor = Color.fromRGBO(0, 0, 0, 0.30);
 const myTextFieldBorderColor = Color.fromRGBO(112, 112, 112, 1);
 const myTextFieldBackgroundColor = Color.fromRGBO(239, 239, 239, 1);
+const elevatedBtnColor = Color.fromRGBO(208, 208, 208, 1);
 
 const unselectedNavigationBar = Color.fromRGBO(0, 0, 0, 0.20);

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:reshop/screens/search_screen.dart';
 import './screens/product_details.dart';
 import './screens/authentication/email_verification.dart';
 import './screens/splash_screen.dart';
@@ -17,4 +18,5 @@ final Map<String, WidgetBuilder> routes = {
   ProductDetails.routeName: (context) => ProductDetails(),
   CategoryScreen.routeName: (context) => CategoryScreen(),
   BottomSheetWidget.routeName: (context) => BottomSheetWidget(),
+  SearchScreen.routeName: (context) => SearchScreen(),
 };

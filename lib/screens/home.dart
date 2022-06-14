@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/rendering.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/enums.dart';
+import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/size_config.dart';
 import 'package:reshop/widgets/home_widgets/categories_widget.dart';
 import 'package:reshop/widgets/product_card.dart';
@@ -20,66 +21,71 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  AppBar homeAppbar = AppBar(
-    title: Container(
-      width: 100,
-      height: 50,
-      child: Image.asset(
-        "assets/images/splash.png",
-      ),
-    ),
-    actions: [
-      TextButton.icon(
-        onPressed: () {},
-        label: Text(
-          "Search",
-          style: TextStyle(
-              color: mySecondTextColor,
-              fontSize: 14,
-              fontWeight: FontWeight.normal),
-        ),
-        icon: Icon(Icons.search, size: 20),
-      ),
-    ],
-    elevation: 0,
-  );
-  AppBar customAppBar = AppBar(
-    title: Container(
-      width: 100,
-      height: 50,
-      child: Image.asset(
-        "assets/images/splash.png",
-      ),
-    ),
-    actions: [
-      TextButton.icon(
-        onPressed: () {},
-        label: Text(
-          "Search",
-          style: TextStyle(
-              color: mySecondTextColor,
-              fontSize: 14,
-              fontWeight: FontWeight.normal),
-        ),
-        icon: Icon(Icons.search, size: 20),
-      ),
-    ],
-    elevation: 0,
-  );
-  AppBar categoriesAppbar = AppBar(
-    title: Text(
-      "Categories",
-      style: TextStyle(
-        fontSize: 22,
-        color: Colors.black,
-        fontWeight: FontWeight.w500,
-      ),
-    ),
-    elevation: 0,
-  );
-
   @override
   Widget build(BuildContext context) {
+    AppBar homeAppbar = AppBar(
+      title: Container(
+        width: 100,
+        height: 50,
+        child: Image.asset(
+          "assets/images/splash.png",
+        ),
+      ),
+      actions: [
+        TextButton.icon(
+          onPressed: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: ((context) => SearchScreen())));
+          },
+          label: Text(
+            "Search",
+            style: TextStyle(
+                color: mySecondTextColor,
+                fontSize: 16,
+                fontWeight: FontWeight.normal),
+          ),
+          icon: Icon(Icons.search, size: 24),
+        ),
+      ],
+      elevation: 0,
+    );
+    AppBar customAppBar = AppBar(
+      title: Container(
+        width: 100,
+        height: 50,
+        child: Image.asset(
+          "assets/images/splash.png",
+        ),
+      ),
+      actions: [
+        TextButton.icon(
+          onPressed: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: ((context) => SearchScreen())));
+          },
+          label: Text(
+            "Search",
+            style: TextStyle(
+                color: mySecondTextColor,
+                fontSize: 16,
+                fontWeight: FontWeight.normal),
+          ),
+          icon: Icon(Icons.search, size: 24),
+        ),
+      ],
+      elevation: 0,
+    );
+    AppBar categoriesAppbar = AppBar(
+      title: Text(
+        "Categories",
+        style: TextStyle(
+          fontSize: 22,
+          color: Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      elevation: 0,
+    );
     final provider = Provider.of<DummyData>(context);
     int _currentIndex = provider.bottomNavigationBar;
     SizeConfig _size = SizeConfig();

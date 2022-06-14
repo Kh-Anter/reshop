@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:reshop/enums.dart';
 import 'package:reshop/models/product.dart';
 import 'package:reshop/screens/category_screen/filter_bottomsheet.dart';
-import 'package:reshop/screens/category_screen/sort_buttomsheet.dart';
+import 'package:reshop/screens/category_screen/sort_bottomsheet.dart';
+import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/widgets/product_card.dart';
 
 import '../../providers/dummyData.dart';
@@ -25,8 +26,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
   var selectedBtn = 0;
   var all;
   var other;
-  var selectedItem = "aaa";
-  var dropdownValue = 'One';
+  //var selectedItem = "aaa";
+  //var dropdownValue = 'One';
   SizeConfig _size = SizeConfig();
 
   @override
@@ -55,6 +56,37 @@ class _CategoryScreenState extends State<CategoryScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  AppBar appBar() {
+    return AppBar(
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back_ios,
+          size: 26,
+        ),
+        onPressed: (() {
+          Navigator.pop(context);
+        }),
+      ),
+      actions: [
+        TextButton.icon(
+          onPressed: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => SearchScreen()));
+          },
+          label: Text(
+            "Search",
+            style: TextStyle(
+                color: mySecondTextColor,
+                fontSize: 16,
+                fontWeight: FontWeight.normal),
+          ),
+          icon: Icon(Icons.search, size: 24),
+        ),
+      ],
+      elevation: 0,
     );
   }
 
@@ -114,34 +146,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
           );
         }),
       ),
-    );
-  }
-
-  AppBar appBar() {
-    return AppBar(
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          size: 26,
-        ),
-        onPressed: (() {
-          Navigator.pop(context);
-        }),
-      ),
-      actions: [
-        TextButton.icon(
-          onPressed: () {},
-          label: Text(
-            "Search",
-            style: TextStyle(
-                color: mySecondTextColor,
-                fontSize: 16,
-                fontWeight: FontWeight.normal),
-          ),
-          icon: Icon(Icons.search, size: 24),
-        ),
-      ],
-      elevation: 0,
     );
   }
 
