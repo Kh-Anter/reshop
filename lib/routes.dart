@@ -5,7 +5,7 @@ import './screens/splash_screen.dart';
 import './screens/home.dart';
 import './screens/authentication/auth_screen.dart';
 import './screens/authentication/forget_password.dart';
-import './screens/category_screen.dart';
+import 'screens/category_screen/category_screen.dart';
 import './widgets/bottom_sheet_widget.dart';
 
 final Map<String, WidgetBuilder> routes = {

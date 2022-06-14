@@ -404,7 +404,7 @@ Package Included:
       "text": "Electronics",
       "image": "assets/images/categories/electronics_icon.png"
     },
-    {"text": "Beauty", "image": "assets/images/categories/beauty_icon2.png"},
+    {"text": "Beauty", "image": "assets/images/categories/beauty_icon1.png"},
     {"text": "Home", "image": "assets/images/categories/home_icon1.png"},
     {"text": "Fashion", "image": "assets/images/categories/fashion_icon1.png"},
     {"text": "Sport", "image": "assets/images/categories/sport_icon.png"},
@@ -440,6 +440,8 @@ Package Included:
     ],
     "Kitchen": ["All", "Water coolers", "Filters", "Glasses", "Accessories"]
   };
+
+  List brands = ["Adidas", "Squadra", "MyHome"];
 
   getBestSellers() {
     myProducts.sort(((a, b) => a.sellCount.compareTo(b.sellCount)));
@@ -480,7 +482,6 @@ Package Included:
         other.add(all[i]);
       }
     }
-    print("--------------hhhhhhh other length ${other.length}");
     return other;
   }
 }

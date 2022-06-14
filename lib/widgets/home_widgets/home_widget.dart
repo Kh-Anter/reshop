@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/constants.dart';
-import 'package:reshop/screens/category_screen.dart';
+import 'package:reshop/screens/category_screen/category_screen.dart';
 
 import '../product_card.dart';
 import '../build_dot.dart';

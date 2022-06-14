@@ -5,7 +5,7 @@ import 'package:reshop/providers/auth.dart';
 import 'package:reshop/providers/dummyData.dart';
 import 'package:reshop/theme.dart';
 
-import './screens/category_screen.dart';
+import 'screens/category_screen/category_screen.dart';
 import './screens/authentication/auth_screen.dart';
 import './screens/authentication/email_verification.dart';
 import './screens/authentication/forget_password.dart';
