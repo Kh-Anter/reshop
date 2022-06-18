@@ -37,24 +37,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
     _size.init(context);
     return Scaffold(
       appBar: appBar(),
-      body: SafeArea(
-        child: Container(
-          child: SingleChildScrollView(
-            child: Center(
-              child: SizedBox(
-                width: _size.getWidth - 20,
-                //  height: _size.getHeight,
-                child: Column(children: [
-                  title(),
-                  SizedBox(height: 10),
-                  subCategory(),
-                  SizedBox(height: 10),
-                  myGridView(),
-                ]),
-              ),
-            ),
-          ),
-        ),
+      body: Padding(
+        padding: EdgeInsets.all(10),
+        child: Column(children: [
+          title(),
+          SizedBox(height: 10),
+          subCategory(),
+          SizedBox(height: 10),
+          Container(height: _size.getHeight - 220, child: myGridView()),
+        ]),
       ),
     );
   }
@@ -156,38 +147,24 @@ class _CategoryScreenState extends State<CategoryScreen> {
     } else {
       other = provider.getBySubCat(all, subCat[selectedBtn]).toList();
     }
-    return Container(
-      height: _size.getHeight,
-      width: _size.getWidth,
-      child: GridView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: selectedBtn == 0 ? all.length : other.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 0.9,
-              crossAxisCount: 2,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8),
-          itemBuilder: (BuildContext context, int index) {
-            return ProductCart(
-              product: all[index],
-            );
-          }),
-      // child: GridView.count(
-      //   crossAxisCount: 2,
-      //   childAspectRatio: 0.8,
-      //   padding: EdgeInsets.all(2),
-      //   scrollDirection: Axis.vertical,
-      //   children: List.generate(
-      //     selectedBtn == 0 ? all.length : other.length,
-      //     (index) => Padding(
-      //       padding: EdgeInsets.all(4),
-      //       child: ProductCart(
-      //         product: all[index],
-      //       ),
-      //     ),
-      //   ),
-      // ),
-    );
+    return
+        // Container(
+        //   height: _size.getHeight,
+        //   width: _size.getWidth,
+        //   child:
+        GridView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: selectedBtn == 0 ? all.length : other.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                childAspectRatio: 0.8,
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8),
+            itemBuilder: (BuildContext context, int index) {
+              return ProductCart(
+                product: all[index],
+              );
+            });
   }
 
   filterBottomSheet(String title) {

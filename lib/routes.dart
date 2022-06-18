@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:reshop/screens/favourites.dart';
 import 'package:reshop/screens/search_screen.dart';
 import './screens/product_details.dart';
 import './screens/authentication/email_verification.dart';
@@ -19,4 +20,5 @@ final Map<String, WidgetBuilder> routes = {
   CategoryScreen.routeName: (context) => CategoryScreen(),
   BottomSheetWidget.routeName: (context) => BottomSheetWidget(),
   SearchScreen.routeName: (context) => SearchScreen(),
+  FavouritesScreen.routeName: (context) => FavouritesScreen(),
 };

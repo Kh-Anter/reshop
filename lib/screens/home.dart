@@ -9,6 +9,7 @@ import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/size_config.dart';
 import 'package:reshop/widgets/home_widgets/cart_widget.dart';
 import 'package:reshop/widgets/home_widgets/categories_widget.dart';
+import 'package:reshop/widgets/home_widgets/profile_widget.dart';
 import 'package:reshop/widgets/product_card.dart';
 import '../providers/dummyData.dart';
 import '../widgets/build_dot.dart';
@@ -80,6 +81,12 @@ class _HomeState extends State<Home> {
                 fontSize: 24,
                 color: Colors.black,
                 fontWeight: FontWeight.bold)));
+    var profileAppbar = appBarCreator(
+        title: Text("My Profile",
+            style: TextStyle(
+                fontSize: 24,
+                color: Colors.black,
+                fontWeight: FontWeight.bold)));
 
     final provider = Provider.of<DummyData>(context);
     int _currentIndex = provider.bottomNavigationBar;
@@ -110,7 +117,7 @@ class _HomeState extends State<Home> {
         break;
       case 4:
         {
-          customAppbar = null;
+          customAppbar = profileAppbar;
         }
         break;
     }
@@ -205,7 +212,7 @@ class _HomeState extends State<Home> {
         break;
       case 4:
         {
-          return;
+          return ProfileWidget();
         }
         break;
     }
