@@ -73,6 +73,7 @@ class _ProductDetailsState extends State<ProductDetails> {
             ),
             Text(
               currentProduct.title,
+              maxLines: 1,
               style: TextStyle(fontSize: 20),
             ),
             Text(
@@ -119,10 +120,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                       size: 35,
                     )),
                 Container(
-                  alignment: Alignment.topCenter,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                       border: Border.all(width: 1, color: mySecondTextColor),
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                      borderRadius: BorderRadius.all(Radius.circular(5))),
                   width: 40,
                   height: 40,
                   child: TextField(
@@ -263,7 +264,11 @@ class _ProductDetailsState extends State<ProductDetails> {
             width: _size.getWidth - 100,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                _dummyData.addToCart(
+                    productId: currentProduct.id,
+                    count: countController.value.text);
+              },
               child: Text(
                 "Add to Cart",
                 style: TextStyle(fontSize: 18),

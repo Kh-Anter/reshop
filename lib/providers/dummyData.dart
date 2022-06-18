@@ -10,7 +10,8 @@ class DummyData with ChangeNotifier {
   List lifeStyle = [];
   int currentPageView = 0;
   int bottomNavigationBar = 0;
-  //AppBar customAppBar=null;
+  List<Map<String, dynamic>> cartProducts = [];
+  bool isInCart = false;
 
   void changeFav(id) {
     myProducts.forEach((element) {
@@ -28,6 +29,44 @@ class DummyData with ChangeNotifier {
 
   void changePageview(int newValue) {
     currentPageView = newValue;
+    notifyListeners();
+  }
+
+  void addToCart({productId, count}) {
+    print("---------------- proID --- : $productId");
+    // print("---------------- count --- : $count");
+    var product = myProducts.firstWhere((element) => element.id == productId);
+    if (cartProducts.length == 0) {
+      cartProducts.add({"product": product, "count": count});
+    } else {
+      for (int i = 0; i < cartProducts.length; i++) {
+        if (cartProducts[i]["product"].id.toString() == productId.toString()) {
+          isInCart = true;
+          break;
+        }
+      }
+      if (!isInCart) {
+        cartProducts.add({"product": product, "count": count});
+      } else if (isInCart) {
+        cartProducts.forEach((element) {
+          if (element["product"].id == productId) {
+            element["count"] = count;
+            isInCart = false;
+            return;
+          }
+        });
+      }
+    }
+    notifyListeners();
+  }
+
+  void editOnCart({productId, count}) {
+    cartProducts.forEach((element) {
+      if (element["product"].id == productId) {
+        element["count"] = count;
+        return;
+      }
+    });
     notifyListeners();
   }
 

@@ -102,7 +102,10 @@ class ProductCart extends StatelessWidget {
                                     fontWeight: FontWeight.normal,
                                     backgroundColor: myPrimaryColor),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                _dummyData.addToCart(
+                                    productId: product.id, count: "1");
+                              },
                             ),
                           ),
                         ),

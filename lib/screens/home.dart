@@ -7,6 +7,7 @@ import 'package:reshop/constants.dart';
 import 'package:reshop/enums.dart';
 import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/size_config.dart';
+import 'package:reshop/widgets/home_widgets/cart_widget.dart';
 import 'package:reshop/widgets/home_widgets/categories_widget.dart';
 import 'package:reshop/widgets/product_card.dart';
 import '../providers/dummyData.dart';
@@ -23,69 +24,63 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    AppBar homeAppbar = AppBar(
-      title: Container(
-        width: 100,
-        height: 50,
-        child: Image.asset(
-          "assets/images/splash.png",
-        ),
-      ),
-      actions: [
-        TextButton.icon(
-          onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: ((context) => SearchScreen())));
-          },
-          label: Text(
-            "Search",
-            style: TextStyle(
-                color: mySecondTextColor,
-                fontSize: 16,
-                fontWeight: FontWeight.normal),
+    var customAppbar = appBarCreator(
+        title: Container(
+            width: 100,
+            height: 50,
+            child: Image.asset("assets/images/splash.png")),
+        action: [
+          TextButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: ((context) => SearchScreen())));
+              },
+              label: Text("Search",
+                  style: TextStyle(
+                      color: mySecondTextColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal)),
+              icon: Icon(Icons.search, size: 24))
+        ]);
+
+    var homeAppbar = appBarCreator(
+        title: Container(
+            width: 100,
+            height: 50,
+            child: Image.asset("assets/images/splash.png")),
+        action: [
+          TextButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: ((context) => SearchScreen())));
+            },
+            label: Text(
+              "Search",
+              style: TextStyle(
+                  color: mySecondTextColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal),
+            ),
+            icon: Icon(Icons.search, size: 24),
           ),
-          icon: Icon(Icons.search, size: 24),
-        ),
-      ],
-      elevation: 0,
-    );
-    AppBar customAppBar = AppBar(
-      title: Container(
-        width: 100,
-        height: 50,
-        child: Image.asset(
-          "assets/images/splash.png",
-        ),
-      ),
-      actions: [
-        TextButton.icon(
-          onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: ((context) => SearchScreen())));
-          },
-          label: Text(
-            "Search",
+        ]);
+
+    var categoriesAppbar = appBarCreator(
+        title: Text("Categories",
             style: TextStyle(
-                color: mySecondTextColor,
-                fontSize: 16,
-                fontWeight: FontWeight.normal),
-          ),
-          icon: Icon(Icons.search, size: 24),
-        ),
-      ],
-      elevation: 0,
-    );
-    AppBar categoriesAppbar = AppBar(
-      title: Text(
-        "Categories",
-        style: TextStyle(
-          fontSize: 22,
-          color: Colors.black,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      elevation: 0,
-    );
+                fontSize: 22,
+                color: Colors.black,
+                fontWeight: FontWeight.w500)));
+
+    var offersAppbar = appBarCreator();
+
+    var cartAppbar = appBarCreator(
+        title: Text("My Cart",
+            style: TextStyle(
+                fontSize: 24,
+                color: Colors.black,
+                fontWeight: FontWeight.bold)));
+
     final provider = Provider.of<DummyData>(context);
     int _currentIndex = provider.bottomNavigationBar;
     SizeConfig _size = SizeConfig();
@@ -95,26 +90,37 @@ class _HomeState extends State<Home> {
     switch (_currentIndex) {
       case 0:
         {
-          customAppBar = homeAppbar;
+          customAppbar = homeAppbar;
         }
         break;
       case 1:
         {
-          customAppBar = categoriesAppbar;
+          customAppbar = categoriesAppbar;
         }
         break;
       case 2:
         {
-          customAppBar = null;
+          customAppbar = offersAppbar;
         }
+        break;
+      case 3:
+        {
+          customAppbar = cartAppbar;
+        }
+        break;
+      case 4:
+        {
+          customAppbar = null;
+        }
+        break;
     }
 
-    onTap(index) {
-      provider.changeBottonNavigationBar(newValue: index);
-    }
+    // onTap(index) {
+    //   provider.changeBottonNavigationBar(newValue: index);
+    // }
 
     return Scaffold(
-      appBar: customAppBar,
+      appBar: customAppbar,
       bottomNavigationBar: BottomNavigationBar(
         iconSize: 28,
         selectedIconTheme: IconThemeData(color: myPrimaryColor),
@@ -129,7 +135,7 @@ class _HomeState extends State<Home> {
         type: BottomNavigationBarType.fixed,
         landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
         currentIndex: _currentIndex,
-        onTap: onTap,
+        onTap: (index) => provider.changeBottonNavigationBar(newValue: index),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -166,18 +172,42 @@ class _HomeState extends State<Home> {
       )),
     );
   }
-}
 
-_homeBody(num) {
-  switch (num) {
-    case 0:
-      {
-        return HomeWidget();
-      }
-      break;
-    case 1:
-      {
-        return CategoriesWidget();
-      }
+  AppBar appBarCreator({title, action}) {
+    return AppBar(
+      title: title,
+      actions: action,
+      elevation: 0,
+    );
+  }
+
+  _homeBody(num) {
+    switch (num) {
+      case 0:
+        {
+          return HomeWidget();
+        }
+        break;
+      case 1:
+        {
+          return CategoriesWidget();
+        }
+        break;
+      case 2:
+        {
+          return;
+        }
+        break;
+      case 3:
+        {
+          return CartWidget();
+        }
+        break;
+      case 4:
+        {
+          return;
+        }
+        break;
+    }
   }
 }
