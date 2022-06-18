@@ -25,6 +25,7 @@ class ProductCart extends StatelessWidget {
                           )));
             },
             child: Container(
+                // constraints: BoxConstraints(minWidth: 200, minHeight: 300),
                 decoration: BoxDecoration(
                     border: Border.all(width: 0.5, color: Colors.grey),
                     borderRadius: BorderRadius.circular(10.0),
@@ -35,26 +36,55 @@ class ProductCart extends StatelessWidget {
                     children: [
                       Expanded(
                         flex: 5,
-                        child: Container(
-                          alignment: Alignment.topRight,
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                            image: AssetImage(product.images[0]),
-                          )),
-                          child: IconButton(
-                              onPressed: () {
-                                _dummyData.changeFav(product.id);
-                              },
-                              icon: product.isFav
-                                  ? const Icon(
-                                      Icons.favorite,
-                                      color: myPrimaryColor,
-                                    )
-                                  : const Icon(Icons.favorite_border_outlined,
-                                      color:
-                                          Color.fromARGB(156, 120, 117, 117))),
+                        child: Stack(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(7),
+                              alignment: Alignment.center,
+                              child: Image.asset(product.images[0]),
+                            ),
+                            Positioned(
+                              right: 7,
+                              top: 7,
+                              child: InkWell(
+                                  onTap: () {
+                                    _dummyData.changeFav(product.id);
+                                  },
+                                  child: product.isFav
+                                      ? const Icon(
+                                          Icons.favorite,
+                                          color: myPrimaryColor,
+                                        )
+                                      : const Icon(
+                                          Icons.favorite_border_outlined,
+                                          color: Color.fromARGB(
+                                              156, 120, 117, 117))),
+                            )
+                          ],
                         ),
                       ),
+                      // Expanded(
+                      //   flex: 5,
+                      //   child: Container(
+                      //     alignment: Alignment.topRight,
+                      //     decoration: BoxDecoration(
+                      //         image: DecorationImage(
+                      //       image: AssetImage(product.images[0]),
+                      //     )),
+                      //     child: IconButton(
+                      //         onPressed: () {
+                      //           _dummyData.changeFav(product.id);
+                      //         },
+                      //         icon: product.isFav
+                      //             ? const Icon(
+                      //                 Icons.favorite,
+                      //                 color: myPrimaryColor,
+                      //               )
+                      //             : const Icon(Icons.favorite_border_outlined,
+                      //                 color:
+                      //                     Color.fromARGB(156, 120, 117, 117))),
+                      //   ),
+                      // ),
                       Flexible(
                         child: Padding(
                           padding: const EdgeInsets.only(

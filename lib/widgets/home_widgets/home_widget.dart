@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/screens/category_screen/category_screen.dart';
@@ -76,7 +77,9 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   Container homeProducts({category}) {
     return Container(
-        height: SizeConfig().getProportionateScreenHeight(250),
+        constraints: BoxConstraints(
+            maxHeight: 200,
+            minHeight: SizeConfig().getProportionateScreenHeight(200)),
         alignment: Alignment.center,
         child: GridView.count(
           crossAxisCount: 1,
