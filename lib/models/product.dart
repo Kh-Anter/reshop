@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart';
 
 class Product {
-  int id;
+  String id;
   int sellCount = 0;
   String title;
-  Enum category;
+  String category;
   String subCat;
   int price;
-  bool isFav;
   List<String> images;
   String brand;
   String description;
@@ -19,7 +18,6 @@ class Product {
       this.category,
       this.subCat,
       this.price,
-      this.isFav,
       this.images,
       this.brand,
       this.description});

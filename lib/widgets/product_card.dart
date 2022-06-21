@@ -50,13 +50,14 @@ class ProductCart extends StatelessWidget {
                                   onTap: () {
                                     _dummyData.changeFav(product.id);
                                   },
-                                  child: product.isFav
-                                      ? const Icon(
-                                          Icons.favorite,
-                                          color: myPrimaryColor,
-                                        )
-                                      : const Icon(
-                                          Icons.favorite_border_outlined,
+                                  child:
+                                      // product.isFav
+                                      //     ? const Icon(
+                                      //         Icons.favorite,
+                                      //         color: myPrimaryColor,
+                                      //       )
+                                      //     : const
+                                      Icon(Icons.favorite_border_outlined,
                                           color: Color.fromARGB(
                                               156, 120, 117, 117))),
                             )

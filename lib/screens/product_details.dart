@@ -243,19 +243,21 @@ class _ProductDetailsState extends State<ProductDetails> {
                 borderRadius: BorderRadius.circular(12)),
             child: IconButton(
               onPressed: (() {
-                _dummyData.changeFav(currentProduct.id);
+                //  _dummyData.changeFav(currentProduct.id);
               }),
-              icon: currentProduct.isFav
-                  ? Icon(
-                      Icons.favorite,
-                      color: myPrimaryColor,
-                      size: 30,
-                    )
-                  : Icon(
-                      Icons.favorite_border,
-                      color: myPrimaryColor,
-                      size: 30,
-                    ),
+              icon:
+                  //  currentProduct.isFav
+                  //     ? Icon(
+                  //         Icons.favorite,
+                  //         color: myPrimaryColor,
+                  //         size: 30,
+                  //       )
+                  //     :
+                  Icon(
+                Icons.favorite_border,
+                color: myPrimaryColor,
+                size: 30,
+              ),
             )),
         Container(
             decoration: BoxDecoration(

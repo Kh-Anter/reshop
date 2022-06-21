@@ -68,7 +68,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                       )),
             )),
         seeMore(text: "Best Sellers"),
-        homeProducts(category: provider.getBestSellers().toList()),
+        homeProducts(category: provider.getBestSellers()),
         seeMore(text: "LifeStyle Products"),
         homeProducts(category: provider.getLifeStyle()),
       ],
@@ -76,23 +76,28 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   Container homeProducts({category}) {
-    return Container(
-        constraints: BoxConstraints(
-            maxHeight: 200,
-            minHeight: SizeConfig().getProportionateScreenHeight(200)),
-        alignment: Alignment.center,
-        child: GridView.count(
-          crossAxisCount: 1,
-          childAspectRatio: 2.6 / 2,
-          padding: EdgeInsets.all(2),
-          scrollDirection: Axis.horizontal,
-          children: List.generate(
-            category.length,
-            (index) => ProductCart(
-              product: category[index],
+    if (category.isEmpty) {
+      print("------------empty----------- !!");
+      return Container();
+    } else {
+      return Container(
+          constraints: BoxConstraints(
+              maxHeight: 250,
+              minHeight: SizeConfig().getProportionateScreenHeight(200)),
+          alignment: Alignment.center,
+          child: GridView.count(
+            crossAxisCount: 1,
+            childAspectRatio: 2.6 / 2,
+            padding: EdgeInsets.all(2),
+            scrollDirection: Axis.horizontal,
+            children: List.generate(
+              category.length,
+              (index) => ProductCart(
+                product: category[index],
+              ),
             ),
-          ),
-        ));
+          ));
+    }
   }
 
   Widget buildCategories({image, text}) {
@@ -149,7 +154,6 @@ class _HomeWidgetState extends State<HomeWidget> {
                 case "Categories":
                   {
                     provider.changeBottonNavigationBar(newValue: 1);
-                    // Navigator.pushNamed(context, CategoriesScreen.routeName);
                   }
               }
             },

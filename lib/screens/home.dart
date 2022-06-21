@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/rendering.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/enums.dart';
+import 'package:reshop/providers/add_products.dart';
 import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/size_config.dart';
 import 'package:reshop/widgets/home_widgets/cart_widget.dart';
@@ -23,6 +24,29 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool _isloading = false;
+  bool init = true;
+  @override
+  void initState() {
+    // DummyData.getAllProducts();
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    if (init) {
+      setState(() {
+        _isloading = true;
+      });
+      await Provider.of<DummyData>(context).FetchAllProducts();
+      setState(() {
+        _isloading = false;
+      });
+    }
+    init = false;
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     var customAppbar = appBarCreator(
@@ -122,10 +146,6 @@ class _HomeState extends State<Home> {
         break;
     }
 
-    // onTap(index) {
-    //   provider.changeBottonNavigationBar(newValue: index);
-    // }
-
     return Scaffold(
       appBar: customAppbar,
       bottomNavigationBar: BottomNavigationBar(
@@ -168,15 +188,17 @@ class _HomeState extends State<Home> {
         ],
       ),
       body: SafeArea(
-          child: SingleChildScrollView(
-        child: Center(
-          child: SizedBox(
-            width: _size.getWidth - 20,
-            child: _homeBody(_currentIndex),
-          ),
-          //),
-        ),
-      )),
+          child: _isloading
+              ? Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  child: Center(
+                    child: SizedBox(
+                      width: _size.getWidth - 20,
+                      child: _homeBody(_currentIndex),
+                    ),
+                    //),
+                  ),
+                )),
     );
   }
 

@@ -38,6 +38,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   }
 
   Widget myFavourites() {
+    /*
     var provider = Provider.of<DummyData>(context);
     List<Product> favList = [];
     provider.myProducts.forEach(
@@ -116,5 +117,6 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
             product: favList[index],
           );
         });
+        */
   }
 }

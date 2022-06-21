@@ -15,6 +15,8 @@ import './screens/splash_screen.dart';
 import './size_config.dart';
 import './routes.dart';
 
+import './providers/dummyData.dart';
+
 void main() {
   runApp(MultiProvider(
     providers: [

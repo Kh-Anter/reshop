@@ -26,8 +26,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
   var selectedBtn = 0;
   var all;
   var other;
-  //var selectedItem = "aaa";
-  //var dropdownValue = 'One';
   SizeConfig _size = SizeConfig();
 
   @override
@@ -145,26 +143,21 @@ class _CategoryScreenState extends State<CategoryScreen> {
     if (selectedBtn == 0) {
       all = provider.getByCategory(widget.title).toList();
     } else {
-      other = provider.getBySubCat(all, subCat[selectedBtn]).toList();
+      other = provider.getBySubCat(subCat[selectedBtn]);
     }
-    return
-        // Container(
-        //   height: _size.getHeight,
-        //   width: _size.getWidth,
-        //   child:
-        GridView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: selectedBtn == 0 ? all.length : other.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                childAspectRatio: 0.8,
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8),
-            itemBuilder: (BuildContext context, int index) {
-              return ProductCart(
-                product: all[index],
-              );
-            });
+    return GridView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: selectedBtn == 0 ? all.length : other.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            childAspectRatio: 0.8,
+            crossAxisCount: 2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8),
+        itemBuilder: (BuildContext context, int index) {
+          return ProductCart(
+            product: selectedBtn == 0 ? all[index] : other[index],
+          );
+        });
   }
 
   filterBottomSheet(String title) {
