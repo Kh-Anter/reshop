@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "519110917048",
+    "firebase_url": "https://reshop-a42f1-default-rtdb.firebaseio.com",
+    "project_id": "reshop-a42f1",
+    "storage_bucket": "reshop-a42f1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:519110917048:android:4faed2dacfbf4e7b5bed4d",
+        "android_client_info": {
+          "package_name": "com.example.reshop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "519110917048-ne1ut4gpdnttjjum13v86fs0ild81hic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6PUwz2SGMQXHbRsvZV5zTyiIssqKXEJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "519110917048-ne1ut4gpdnttjjum13v86fs0ild81hic.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

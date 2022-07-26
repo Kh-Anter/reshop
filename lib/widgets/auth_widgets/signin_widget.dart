@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:reshop/constants.dart';
+import 'package:reshop/providers/auth_signin.dart';
 
-import 'package:reshop/providers/auth.dart';
+import 'package:reshop/providers/auth_signup.dart';
+import 'package:reshop/providers/sigin_up.dart';
 import 'package:reshop/screens/authentication/auth_screen.dart';
 import 'package:reshop/screens/authentication/forget_password.dart';
 import 'package:reshop/screens/home.dart';
@@ -28,7 +30,9 @@ class _SigninWidgetState extends State<SigninWidget> {
   @override
   Widget build(BuildContext context) {
     _sizeConfig.init(context);
-    final authProvider = Provider.of<AuthProvider>(context);
+    final _auth_signup = Provider.of<Auth_SignUp>(context, listen: false);
+    final _auth_signin = Provider.of<Auth_SignIn>(context);
+    final _signInOrUp = Provider.of<SignInOrUp>(context, listen: false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -50,9 +54,9 @@ class _SigninWidgetState extends State<SigninWidget> {
                 MyTextField(
                   labelText: "Email",
                   type: TextInputType.name,
-                  controller: authProvider.email_ctr,
+                  controller: _auth_signin.email_ctr,
                   validator: (value) {
-                    if (!authProvider.validatEmail(value)) {
+                    if (!_auth_signup.validatEmail(value)) {
                       setState(() {
                         emailError = "Invalid Email!";
                       });
@@ -68,11 +72,11 @@ class _SigninWidgetState extends State<SigninWidget> {
                       )),
                 MyTextField(
                   labelText: "Password",
-                  controller: authProvider.password_ctr,
+                  controller: _auth_signin.password_ctr,
                   validator: (value) {
                     if (value.toString().length < 6) {
                       setState(() {
-                        passError = "To short password!";
+                        passError = "Too short password!";
                       });
                     }
                   },
@@ -102,19 +106,27 @@ class _SigninWidgetState extends State<SigninWidget> {
                   height: SizeConfig().getProportionateScreenHeight(60),
                   child: ElevatedButton(
                       onPressed: () {
+                        FocusScope.of(context).unfocus();
                         setState(() {
                           passError = "";
                           emailError = "";
-                          if (authProvider.email_ctr.text ==
-                                  "khaledanter0@gmail.com" &&
-                              authProvider.password_ctr.text == "123456") {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Home()));
+                          _globalKey.currentState.validate();
+                          if (emailError == "" && passError == "") {
+                            _auth_signup.changeLoadingState(true);
+                            _auth_signin.signIn().then((value) {
+                              if (value == "") {
+                                return Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Home()));
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(value.toString())));
+                              }
+                              _auth_signup.changeLoadingState(false);
+                            });
                           }
                         });
-                        if (_globalKey.currentState.validate()) {}
                       },
                       child: Text(
                         "Sign in",
@@ -202,7 +214,7 @@ class _SigninWidgetState extends State<SigninWidget> {
           ),
           TextButton(
               onPressed: () {
-                authProvider.changeStatus();
+                _signInOrUp.changeAuthState(false);
               },
               child: Text(
                 "Sign up now",

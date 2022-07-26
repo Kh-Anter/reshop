@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reshop/constants.dart';
-import 'package:reshop/providers/auth.dart';
+import 'package:reshop/providers/auth_signup.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/widgets/auth_widgets/mytextfield.dart';
 
@@ -17,7 +17,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   String error = "";
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<AuthProvider>(context);
+    final provider = Provider.of<Auth_SignUp>(context);
     return Scaffold(
       appBar: AppBar(
           leading: IconButton(

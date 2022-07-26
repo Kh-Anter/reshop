@@ -77,7 +77,6 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   Container homeProducts({category}) {
     if (category.isEmpty) {
-      print("------------empty----------- !!");
       return Container();
     } else {
       return Container(

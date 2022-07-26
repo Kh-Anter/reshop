@@ -10,7 +10,6 @@ import 'package:reshop/widgets/product_card.dart';
 import '../../providers/dummyData.dart';
 import '../../constants.dart';
 import '../../size_config.dart';
-import '../../widgets/bottom_sheet_widget.dart';
 
 class CategoryScreen extends StatefulWidget {
   static const routeName = "/CategoryScreen";

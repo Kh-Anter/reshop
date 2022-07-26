@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/enums.dart';
 import 'package:reshop/providers/add_products.dart';
+import 'package:reshop/providers/auth_isloggedin.dart';
 import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/size_config.dart';
 import 'package:reshop/widgets/home_widgets/cart_widget.dart';
@@ -24,6 +25,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool _isFirstTime = true;
   bool _isloading = false;
   bool init = true;
   @override
@@ -49,6 +51,16 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<DummyData>(context);
+    SizeConfig _size = SizeConfig();
+    _size.init(context);
+    var _oriantation = _size.getOriantation;
+    int _currentIndex = provider.bottomNavigationBar;
+    // if (_isFirstTime) {
+    //   _currentIndex = 0;
+    //   _isFirstTime = false;
+    // }
+
     var customAppbar = appBarCreator(
         title: Container(
             width: 100,
@@ -67,7 +79,6 @@ class _HomeState extends State<Home> {
                       fontWeight: FontWeight.normal)),
               icon: Icon(Icons.search, size: 24))
         ]);
-
     var homeAppbar = appBarCreator(
         title: Container(
             width: 100,
@@ -89,16 +100,13 @@ class _HomeState extends State<Home> {
             icon: Icon(Icons.search, size: 24),
           ),
         ]);
-
     var categoriesAppbar = appBarCreator(
         title: Text("Categories",
             style: TextStyle(
                 fontSize: 22,
                 color: Colors.black,
                 fontWeight: FontWeight.w500)));
-
     var offersAppbar = appBarCreator();
-
     var cartAppbar = appBarCreator(
         title: Text("My Cart",
             style: TextStyle(
@@ -111,12 +119,6 @@ class _HomeState extends State<Home> {
                 fontSize: 24,
                 color: Colors.black,
                 fontWeight: FontWeight.bold)));
-
-    final provider = Provider.of<DummyData>(context);
-    int _currentIndex = provider.bottomNavigationBar;
-    SizeConfig _size = SizeConfig();
-    _size.init(context);
-    var _oriantation = _size.getOriantation;
 
     switch (_currentIndex) {
       case 0:
