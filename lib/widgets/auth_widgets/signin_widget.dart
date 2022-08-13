@@ -6,7 +6,7 @@ import 'package:reshop/constants.dart';
 import 'package:reshop/providers/auth_signin.dart';
 
 import 'package:reshop/providers/auth_signup.dart';
-import 'package:reshop/providers/sigin_up.dart';
+import 'package:reshop/providers/auth_other.dart';
 import 'package:reshop/screens/authentication/auth_screen.dart';
 import 'package:reshop/screens/authentication/forget_password.dart';
 import 'package:reshop/screens/home.dart';
@@ -32,7 +32,7 @@ class _SigninWidgetState extends State<SigninWidget> {
     _sizeConfig.init(context);
     final _auth_signup = Provider.of<Auth_SignUp>(context, listen: false);
     final _auth_signin = Provider.of<Auth_SignIn>(context);
-    final _signInOrUp = Provider.of<SignInOrUp>(context, listen: false);
+    final _auth_other = Provider.of<Auth_other>(context, listen: false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -112,19 +112,9 @@ class _SigninWidgetState extends State<SigninWidget> {
                           emailError = "";
                           _globalKey.currentState.validate();
                           if (emailError == "" && passError == "") {
-                            _auth_signup.changeLoadingState(true);
-                            _auth_signin.signIn().then((value) {
-                              if (value == "") {
-                                return Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Home()));
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(value.toString())));
-                              }
-                              _auth_signup.changeLoadingState(false);
-                            });
+                            _auth_other.changeLoadingState(true);
+                            _auth_signin.signIn(context);
+                            _auth_other.changeLoadingState(false);
                           }
                         });
                       },
@@ -181,7 +171,11 @@ class _SigninWidgetState extends State<SigninWidget> {
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                     side: BorderSide(color: mySecondTextColor, width: 1)))),
-            onPressed: () {},
+            onPressed: () {
+              _auth_other.changeLoadingState(true);
+              Auth_SignIn().signInWithGoogle(context);
+              _auth_other.changeLoadingState(false);
+            },
             label: Text(
               "Sign in with Google",
               style: TextStyle(fontSize: 17, color: mySecondTextColor),
@@ -199,7 +193,11 @@ class _SigninWidgetState extends State<SigninWidget> {
                 shape: MaterialStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                     side: BorderSide(color: mySecondTextColor, width: 1)))),
-            onPressed: () {},
+            onPressed: () {
+              // _auth_other.changeLoadingState(true);
+              Auth_SignIn().signInWithFacebook(context);
+              // _auth_other.changeLoadingState(false);
+            },
             label: Text(
               "Sign in with Facebook",
               style: TextStyle(fontSize: 17, color: mySecondTextColor),
@@ -214,7 +212,7 @@ class _SigninWidgetState extends State<SigninWidget> {
           ),
           TextButton(
               onPressed: () {
-                _signInOrUp.changeAuthState(false);
+                _auth_other.changeAuthState(false);
               },
               child: Text(
                 "Sign up now",

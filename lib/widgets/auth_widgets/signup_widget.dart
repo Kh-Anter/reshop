@@ -1,11 +1,14 @@
+import 'dart:async';
+
 import 'package:email_auth/email_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/providers/auth_signin.dart';
 import 'package:reshop/providers/auth_signup.dart';
-import 'package:reshop/providers/sigin_up.dart';
+import 'package:reshop/providers/auth_other.dart';
 import '/screens/authentication/verification.dart';
 import 'package:reshop/size_config.dart';
 import 'package:reshop/widgets/auth_widgets/mytextfield.dart';
@@ -41,7 +44,7 @@ class _SignupWidgetState extends State<SignupWidget> {
   Widget build(BuildContext context) {
     final _auth_signup = Provider.of<Auth_SignUp>(context);
     final _auth_signin = Provider.of<Auth_SignIn>(context, listen: false);
-    final _signInOrUp = Provider.of<SignInOrUp>(context, listen: false);
+    final _auth_other = Provider.of<Auth_other>(context, listen: false);
     _sizeConfig.init(context);
 
     return Center(
@@ -123,6 +126,7 @@ class _SignupWidgetState extends State<SignupWidget> {
                 child: ElevatedButton(
                     onPressed: () {
                       FocusScope.of(context).unfocus();
+                      _auth_other.changeLoadingState(true);
                       nameError = "";
                       emailError = "";
                       phoneError = "";
@@ -134,14 +138,11 @@ class _SignupWidgetState extends State<SignupWidget> {
                           emailError == "" &&
                           phoneError == "" &&
                           repassError == "") {
-                        _auth_signup.changeLoadingState(true);
-                        _auth_signup.checkEmailAndPhone(context).then((value) {
-                          if (value) {
-                            _auth_signup.phoneVerification(context);
-                          } else {
-                            _auth_signup.changeLoadingState(false);
-                          }
-                        });
+                        _auth_signup.signUp(
+                            _auth_signin.email_ctr.text, context);
+                        // Timer.periodic(Duration(seconds: 5), (timer) {});
+                      } else {
+                        _auth_other.changeLoadingState(false);
                       }
                     },
                     child: Text(
@@ -167,7 +168,7 @@ class _SignupWidgetState extends State<SignupWidget> {
             ),
             TextButton(
                 onPressed: () {
-                  _signInOrUp.changeAuthState(true);
+                  _auth_other.changeAuthState(true);
                 },
                 child: Text(
                   "Sign in",

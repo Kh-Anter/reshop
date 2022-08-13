@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/constants.dart';
+import 'package:reshop/providers/auth_readwrite.dart';
 import '../providers/dummyData.dart';
 import '../widgets/build_dot.dart';
 
@@ -8,8 +10,8 @@ import '../size_config.dart';
 
 class ProductDetails extends StatefulWidget {
   static const routeName = "/productDetails";
-  var productId;
-  ProductDetails({this.productId, Key key});
+  var product;
+  ProductDetails({this.product, Key key});
 
   @override
   State<ProductDetails> createState() => _ProductDetailsState();
@@ -19,22 +21,16 @@ class _ProductDetailsState extends State<ProductDetails> {
   SizeConfig _size = SizeConfig();
   PageController _pageController = PageController(initialPage: 0);
   TextEditingController countController = TextEditingController(text: "1");
-  var currentProduct;
-  var imagesLength;
+  var _auth_readWrite;
+  var uid = FirebaseAuth.instance.currentUser.uid;
+  bool isFav = false;
 
   @override
   Widget build(BuildContext context) {
     _size.init(context);
     var _dummyData = Provider.of<DummyData>(context);
-    _dummyData.myProducts.forEach((element) {
-      if (element.id == widget.productId) {
-        currentProduct = element;
-        imagesLength = element.images.length;
-        return;
-      }
-      ;
-    });
-
+    _auth_readWrite = Provider.of<Auth_ReadWrite>(context);
+    isFav = widget.product.isFav;
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -56,9 +52,9 @@ class _ProductDetailsState extends State<ProductDetails> {
               child: PageView.builder(
                 controller: _pageController,
                 itemBuilder: (context, index) {
-                  return Image.asset(currentProduct.images[index]);
+                  return Image.network(widget.product.images[index]);
                 },
-                itemCount: imagesLength,
+                itemCount: widget.product.images.length,
                 onPageChanged: (value) {
                   _dummyData.changePageview(value);
                 },
@@ -67,17 +63,17 @@ class _ProductDetailsState extends State<ProductDetails> {
             SizedBox(
               height: 15,
             ),
-            BuildDot(length: imagesLength),
+            BuildDot(length: widget.product.images.length),
             SizedBox(
               height: 15,
             ),
             Text(
-              currentProduct.title,
+              widget.product.title,
               maxLines: 1,
               style: TextStyle(fontSize: 20),
             ),
             Text(
-              currentProduct.brand,
+              widget.product.brand,
               style:
                   TextStyle(fontSize: 16, color: Color.fromRGBO(1, 1, 1, 0.5)),
             ),
@@ -95,7 +91,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                     child: Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                        child: Text(currentProduct.price.toString() + " L.E",
+                        child: Text(widget.product.price.toString() + " L.E",
                             style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
@@ -201,7 +197,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         child: TabBarView(children: [
                           Container(
                             child: Text(
-                              currentProduct.description,
+                              widget.product.description,
                               style: TextStyle(color: Colors.black45),
                             ),
                           ),
@@ -232,33 +228,36 @@ class _ProductDetailsState extends State<ProductDetails> {
 
   bottomWidget() {
     var _dummyData = Provider.of<DummyData>(context);
+    var _auth_readwrite = Provider.of<Auth_ReadWrite>(context, listen: false);
+
     return Row(
       children: [
         Container(
-            margin: EdgeInsets.all(10),
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-                border: Border.all(color: myPrimaryColor, width: 1),
-                borderRadius: BorderRadius.circular(12)),
-            child: IconButton(
-              onPressed: (() {
-                //  _dummyData.changeFav(currentProduct.id);
-              }),
-              icon:
-                  //  currentProduct.isFav
-                  //     ? Icon(
-                  //         Icons.favorite,
-                  //         color: myPrimaryColor,
-                  //         size: 30,
-                  //       )
-                  //     :
-                  Icon(
-                Icons.favorite_border,
-                color: myPrimaryColor,
-                size: 30,
-              ),
-            )),
+          margin: EdgeInsets.all(10),
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+              border: Border.all(color: myPrimaryColor, width: 1),
+              borderRadius: BorderRadius.circular(12)),
+          child: StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return IconButton(
+                  onPressed: () {
+                    _auth_readWrite.changeFavorite(uid, widget.product.id);
+                    setState(() {
+                      isFav = !isFav;
+                    });
+                    _dummyData.changeFavInMyproduct(
+                        ProductId: widget.product.id);
+                    _auth_readWrite.changeFavorite(uid, widget.product.id);
+                  },
+                  icon: isFav
+                      ? Icon(Icons.favorite, color: myPrimaryColor)
+                      : Icon(Icons.favorite_border_outlined,
+                          color: Color.fromARGB(156, 120, 117, 117)));
+            },
+          ),
+        ),
         Container(
             decoration: BoxDecoration(
                 //  border: Border.all(color: myPrimaryColor, width: 1),
@@ -267,9 +266,8 @@ class _ProductDetailsState extends State<ProductDetails> {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                _dummyData.addToCart(
-                    productId: currentProduct.id,
-                    count: countController.value.text);
+                _auth_readWrite.addToCart(
+                    widget.product.id, countController.text, context);
               },
               child: Text(
                 "Add to Cart",

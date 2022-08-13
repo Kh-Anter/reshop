@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:reshop/constants.dart';
 import 'package:provider/provider.dart';
-import 'package:reshop/providers/sigin_up.dart';
+import 'package:reshop/providers/auth_other.dart';
 import 'package:reshop/size_config.dart';
 import 'package:reshop/widgets/auth_widgets/signin_widget.dart';
 import 'package:reshop/widgets/auth_widgets/signup_widget.dart';
@@ -34,12 +34,12 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<Auth_SignUp>(context);
-    final signInOrUp = Provider.of<SignInOrUp>(context);
+    final auth_other = Provider.of<Auth_other>(context);
     _sizeConfig.init(context);
 
     return Scaffold(
       body: ModalProgressHUD(
-        inAsyncCall: authProvider.isLoading,
+        inAsyncCall: auth_other.isLoading,
         child: SafeArea(
           child: Container(
             padding: EdgeInsets.all(10),
@@ -51,25 +51,25 @@ class _AuthScreenState extends State<AuthScreen> {
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   TextButton(
                       onPressed: () {
-                        if (!signInOrUp.isSignIn) {
-                          signInOrUp.changeAuthState(true);
+                        if (!auth_other.isSignIn) {
+                          auth_other.changeAuthState(true);
                         }
                       },
                       child: Text(
                         "Sign in",
-                        style: signInOrUp.isSignIn ? selected : unselected,
+                        style: auth_other.isSignIn ? selected : unselected,
                       )),
                   TextButton(
                     onPressed: () {
-                      if (signInOrUp.isSignIn) {
-                        signInOrUp.changeAuthState(false);
+                      if (auth_other.isSignIn) {
+                        auth_other.changeAuthState(false);
                       }
                     },
                     child: Text("Sign up",
-                        style: signInOrUp.isSignIn ? unselected : selected),
+                        style: auth_other.isSignIn ? unselected : selected),
                   )
                 ]),
-                signInOrUp.isSignIn ? SigninWidget() : SignupWidget(),
+                auth_other.isSignIn ? SigninWidget() : SignupWidget(),
               ]),
             ),
           ),

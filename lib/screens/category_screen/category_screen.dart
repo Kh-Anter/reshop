@@ -36,13 +36,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
       appBar: appBar(),
       body: Padding(
         padding: EdgeInsets.all(10),
-        child: Column(children: [
-          title(),
-          SizedBox(height: 10),
-          subCategory(),
-          SizedBox(height: 10),
-          Container(height: _size.getHeight - 220, child: myGridView()),
-        ]),
+        child: SingleChildScrollView(
+          child: Column(children: [
+            title(),
+            SizedBox(height: 10),
+            subCategory(),
+            SizedBox(height: 10),
+            Container(height: _size.getHeight - 220, child: myGridView()),
+          ]),
+        ),
       ),
     );
   }

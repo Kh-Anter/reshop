@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/constants.dart';
 import 'package:reshop/models/product.dart';
+import 'package:reshop/providers/auth_readwrite.dart';
 import 'package:reshop/size_config.dart';
 
 import '../../providers/dummyData.dart';
@@ -17,77 +18,77 @@ class CartWidget extends StatefulWidget {
 
 class _CartWidgetState extends State<CartWidget> {
   SizeConfig _size = SizeConfig();
-  int total = 0;
-  bool isEmpty;
 
   @override
   Widget build(BuildContext context) {
-    var cartProducts = null;
-    _size.init(context);
     var _provider = Provider.of<DummyData>(context);
-    cartProducts = _provider.cartProducts;
-    total = 0;
-    for (int i = 0; i < cartProducts.length; i++) {
-      total += (int.parse(cartProducts[i]["count"])) *
-          (cartProducts[i]["product"].price);
-    }
-    if (cartProducts.length == 0) {
-      isEmpty = true;
-    } else {
-      isEmpty = false;
-    }
+    var _auth_readWrite = Provider.of<Auth_ReadWrite>(context, listen: false);
+    _size.init(context);
+
     return Padding(
       padding: EdgeInsets.all(10),
       child: Center(
-        child: SingleChildScrollView(
-            child: isEmpty
-                ? Column(children: [
-                    Container(
-                        height: _size.getHeight / 2.8,
-                        width: _size.getWidth,
-                        margin: EdgeInsets.only(bottom: 20),
-                        child: Image.asset("assets/images/emptycart.png")),
-                    Text(
-                      "Your cart is empty !",
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    Text(
-                      "Add the products you want to add",
-                      style: TextStyle(fontSize: 12, color: mySecondTextColor),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(30),
-                      width: _size.getWidth / 3,
-                      height: 45,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10)))),
-                          onPressed: () =>
-                              _provider.changeBottonNavigationBar(newValue: 2),
-                          child: Text(
-                            "Go to offers",
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          )),
-                    ),
-                  ])
-                : buildCart(cartProducts: cartProducts, provider: _provider)),
-      ),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        FutureBuilder(
+            future: _auth_readWrite.readCart(context),
+            builder: (context, snapshot) {
+              print("-----------hhhhh here hhhhh ");
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              }
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData && snapshot.data.length != 0) {
+                  return buildCart(
+                      cartProducts: snapshot.data,
+                      provider: _auth_readWrite,
+                      ctx: context);
+                } else {
+                  return emptyCard(_provider);
+                }
+              } else {
+                return Container();
+              }
+            }),
+      ])),
     );
   }
 
-  Widget buildCart({cartProducts, provider}) {
+  Widget buildCart({cartProducts, provider, ctx}) {
+    // var total = provider.total;
     TextStyle txtStyle =
         TextStyle(color: Color.fromRGBO(1, 1, 1, 0.5), fontSize: 15);
     return Column(
       children: [
         for (var i = 0; i < cartProducts.length; i++)
-          (buildCartProduct(
-              cartProducts[i]["product"], cartProducts[i]["count"], provider)),
+          Dismissible(
+            secondaryBackground: Container(
+                color: myPrimaryLightColor,
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: EdgeInsets.only(right: 50),
+                  child: Icon(
+                    Icons.delete,
+                    size: 35,
+                  ),
+                )),
+            background: Container(
+                color: myPrimaryLightColor,
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 50),
+                  child: Icon(
+                    Icons.delete,
+                    size: 35,
+                  ),
+                )),
+            key: ValueKey(cartProducts[i]["product"].id),
+            child: buildCartProduct(cartProducts[i]["product"],
+                cartProducts[i]["count"], provider, ctx),
+            onDismissed: (_) async {
+              if (cartProducts.length == 1) setState(() {});
+              await provider.removeFromCart(cartProducts[i]["product"].id);
+            },
+          ),
         Padding(
           padding: EdgeInsets.only(bottom: 5),
           child: Row(
@@ -97,10 +98,9 @@ class _CartWidgetState extends State<CartWidget> {
                 "Items :",
                 style: txtStyle,
               ),
-              Text(
-                total.toString() + " L.E",
-                style: txtStyle,
-              )
+              Consumer<Auth_ReadWrite>(
+                  builder: (context, value, child) =>
+                      Text(value.total.toString() + " L.E", style: txtStyle))
             ],
           ),
         ),
@@ -124,13 +124,9 @@ class _CartWidgetState extends State<CartWidget> {
               "Total",
               style: TextStyle(fontSize: 15),
             ),
-            Text(
-              total.toString() + " L.E",
-              style: TextStyle(
-                  color: myPrimaryColor,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold),
-            )
+            Consumer<Auth_ReadWrite>(
+                builder: (context, value, child) =>
+                    Text(value.total.toString() + " L.E", style: txtStyle))
           ],
         ),
         SizedBox(
@@ -154,8 +150,14 @@ class _CartWidgetState extends State<CartWidget> {
     );
   }
 
-  Widget buildCartProduct(Product myproduct, count, provider) {
+  Widget buildCartProduct(
+    Product myproduct,
+    count,
+    provider,
+    ctx,
+  ) {
     TextEditingController countController = TextEditingController(text: count);
+    // total += int.parse(myproduct.price.toString()) * int.parse(count);
     return Container(
       padding: EdgeInsets.only(top: 15, bottom: 15, left: 15, right: 10),
       margin: EdgeInsets.only(bottom: 15),
@@ -170,7 +172,7 @@ class _CartWidgetState extends State<CartWidget> {
           Container(
               padding: EdgeInsets.only(right: 10),
               width: _size.getWidth / 4,
-              child: Image.asset(myproduct.images[0])),
+              child: Image.network(myproduct.images[0])),
           Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -203,77 +205,95 @@ class _CartWidgetState extends State<CartWidget> {
               ),
             ]),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InkWell(
-                  onTap: () {
-                    if (!countController.text.isEmpty) {
-                      int value = int.parse(countController.value.text);
-                      if (value < 999) {
-                        value++;
-                        countController.text = value.toString();
-                        provider.addToCart(
-                            productId: myproduct.id,
-                            count: countController.text);
+          StatefulBuilder(
+            builder: (context, setState) => Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                    onTap: () {
+                      if (!countController.text.isEmpty) {
+                        int value = int.parse(countController.value.text);
+                        if (value < 999) {
+                          setState(() {
+                            value++;
+                            countController.text = value.toString();
+                          });
+                          provider.addToCart(
+                              myproduct.id, countController.text, ctx);
+                        }
                       }
-                    }
-                  },
-                  child: Icon(
-                    Icons.keyboard_arrow_up_sharp,
-                    color: myPrimaryColor,
-                    size: 28,
-                  )),
-              Container(
-                padding: EdgeInsets.all(0),
-                alignment: Alignment.topCenter,
-                decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: mySecondTextColor),
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                width: 30,
-                height: 30,
-                child: TextField(
-                  controller: countController,
-                  textAlign: TextAlign.center,
-                  maxLength: 3,
-                  keyboardType: TextInputType.number,
-                  //onChanged: ,
-                  onSubmitted: (value) {
-                    provider.editOnCart(productId: myproduct.id, count: value);
-                  },
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: countController.text,
-                    counterText: "",
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-              InkWell(
-                  onTap: () {
-                    if (!countController.text.isEmpty) {
-                      int value = int.parse(countController.value.text);
-                      if (value != null && value > 1) {
-                        value--;
-                        countController.text = value.toString();
-                        provider.addToCart(
-                            productId: myproduct.id,
-                            count: countController.text);
+                    },
+                    child: Icon(Icons.keyboard_arrow_up_sharp,
+                        color: myPrimaryColor, size: 28)),
+                Container(
+                    padding: EdgeInsets.all(0),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: mySecondTextColor),
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                    width: 30,
+                    height: 30,
+                    child: Text(countController.text.toString())),
+                InkWell(
+                    onTap: () {
+                      if (!countController.text.isEmpty) {
+                        int value = int.parse(countController.value.text);
+                        if (value != null && value > 1) {
+                          setState(() {
+                            value--;
+                            countController.text = value.toString();
+                          });
+                          provider.addToCart(
+                              myproduct.id, countController.text, ctx);
+                        }
                       }
-                    }
-                  },
-                  child: Icon(
-                    Icons.keyboard_arrow_down_sharp,
-                    color: myPrimaryColor,
-                    size: 28,
-                  ))
-            ],
+                    },
+                    child: Icon(
+                      Icons.keyboard_arrow_down_sharp,
+                      color: myPrimaryColor,
+                      size: 28,
+                    ))
+              ],
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Widget emptyCard(_provider) {
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Container(
+          height: _size.getHeight / 2.8,
+          width: _size.getWidth,
+          margin: EdgeInsets.only(bottom: 20),
+          child: Image.asset("assets/images/emptycart.png")),
+      Text(
+        "Your cart is empty !",
+        style: TextStyle(fontSize: 20),
+      ),
+      Text(
+        "Add the products you want to add",
+        style: TextStyle(fontSize: 12, color: mySecondTextColor),
+      ),
+      Container(
+        margin: EdgeInsets.all(30),
+        width: _size.getWidth / 3,
+        height: 45,
+        child: ElevatedButton(
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)))),
+            onPressed: () {
+              _provider.changeBottonNavigationBar(newValue: 2);
+            },
+            child: Text(
+              "Go to offers",
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            )),
+      ),
+    ]);
   }
 }

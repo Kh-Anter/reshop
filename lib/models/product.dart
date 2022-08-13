@@ -10,6 +10,7 @@ class Product {
   List<String> images;
   String brand;
   String description;
+  bool isFav;
 
   Product(
       {this.id,
@@ -20,5 +21,6 @@ class Product {
       this.price,
       this.images,
       this.brand,
-      this.description});
+      this.description,
+      this.isFav});
 }

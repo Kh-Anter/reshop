@@ -49,6 +49,8 @@ dependencies:
   connectivity_plus: ^2.3.5
   shared_preferences: ^2.0.15
   google_sign_in: ^5.4.0
+  firebase_app_check: ^0.0.6+18
+  flutter_facebook_auth: ^4.4.0+1
 
 
 dev_dependencies:
@@ -98,24 +100,6 @@ flutter:
     - assets/images/
     - assets/images/categories/
     - assets/images/onboarding/
-    - assets/images/products/Categories/beauty/adidas/
-    - assets/images/products/Categories/beauty/dove/
-    - assets/images/products/Categories/beauty/makeup/
-    - assets/images/products/Categories/beauty/nivea/
-    - assets/images/products/Categories/beauty/pond's/
-    - assets/images/products/Categories/electronics/galaxy/
-    - assets/images/products/Categories/electronics/headphone/
-    - assets/images/products/Categories/electronics/iphone12/
-    - assets/images/products/Categories/electronics/iphone13 pro/
-    - assets/images/products/Categories/Fashion/Fashion Slip/
-    - assets/images/products/Categories/Fashion/Fashion Sneakers/
-    - assets/images/products/Categories/homee/Home Wooden Coasters/
-    - assets/images/products/Categories/homee/Kitchen Scissors/
-    - assets/images/products/Categories/kitchen/SHOWAY Egg cooker/
-    - assets/images/products/Categories/kitchen/Trueval Rectangular/
-    - assets/images/products/Categories/Sport/11 Pcs Resistance Fitness Band Set/
-    - assets/images/products/Categories/Sport/Sport Gloves/
-
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

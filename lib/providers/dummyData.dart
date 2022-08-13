@@ -1,9 +1,13 @@
+import 'dart:io';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:reshop/models/product.dart';
 import 'package:http/http.dart' as http;
+import 'package:reshop/providers/auth_readwrite.dart';
 import 'dart:convert';
 
 import '../models/product.dart';
@@ -17,76 +21,81 @@ class DummyData with ChangeNotifier {
   List<Map<String, dynamic>> cartProducts = [];
   bool isInCart = false;
   List<Product> myProducts = [];
+  List<String> myFavIds = [];
+  List<Product> myFavProducts = [];
+  List<Product> offers = [];
 
-  Future<void> FetchAllProducts() async {
+  Future<void> FetchAllProducts(context) async {
+    offers = [];
     const url =
         "https://reshop-a42f1-default-rtdb.firebaseio.com/products.json";
     try {
       final result = await http.get(Uri.parse(url));
       final data = json.decode(result.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
+      await FetchAllFav();
       data.forEach((prodId, prodData) {
-        loadedProducts.add(Product(
-          id: prodId,
-          title: prodData["title"],
-          brand: prodData["brand"],
-          category: prodData["category"],
-          price: prodData["price"],
-          description: prodData["description"],
-          sellCount: prodData["sellCount"],
-          subCat: prodData["subCat"],
-          images: List.generate(
-              prodData["images"].length, (index) => prodData["images"][index]),
-
-          // images: prodData["images"],
-        ));
+        var prod = Product(
+            id: prodData["id"],
+            title: prodData["title"],
+            brand: prodData["brand"],
+            category: prodData["category"],
+            price: prodData["price"],
+            description: prodData["description"],
+            sellCount: prodData["sellCount"],
+            subCat: prodData["subCat"],
+            images: List.generate(prodData["images"].length,
+                (index) => prodData["images"][index]),
+            isFav: myFavIds.contains(prodData["id"]));
+        loadedProducts.add(prod);
+        if (prodData["off"] != null) {
+          offers.add(prod);
+          print("--------off data: ${prodData["off"]}");
+        }
+        ;
       });
       myProducts = loadedProducts;
       notifyListeners();
       print('---------------- myproductLenght : ${myProducts.length}');
-    } catch (error) {
-      throw (error);
-    }
+    } on SocketException catch (error) {
+      if (error.message == "Connection timed out") {
+        print("conneciton time out -----------------");
+      }
+    } catch (e) {}
   }
 
-  // Future<void> addProduct(
-  //     {title, category, price, brand, description, sellCount, images}) async {
-  //   const url =
-  //       "https://reshop-a42f1-default-rtdb.firebaseio.com/products.json";
-  //   var result = await http.post(Uri.parse(url),
-  //       body: json.encode({
-  //         "title": title,
-  //         "category": category,
-  //         "price": price,
-  //         "brand": brand,
-  //         "description": description,
-  //         "sellCount": sellCount,
-  //         "images": images
-  //       }));
-  //   print("--- add product result --- : ${json.decode(result.body)}");
-  // }
+  Future<void> FetchAllFav() async {
+    final uid = FirebaseAuth.instance.currentUser.uid;
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('favourites')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        myFavIds.add(doc.id);
+      });
+    });
+  }
 
-  // void startAdding() {
-  //   myProducts.forEach((e) {
-  //     addProduct(
-  //         title: e.title,
-  //         category: e.category.name,
-  //         price: e.price,
-  //         brand: e.brand,
-  //         description: e.description,
-  //         sellCount: e.sellCount,
-  //         images: e.images);
-  //     print("--- for each product run ---");
-  //   });
-  // }
+  Future<List<Product>> getFavProduct() async {
+    myFavProducts = [];
+    myProducts.forEach((element) {
+      if (element.isFav) {
+        myFavProducts.add(element);
+      }
+    });
+    return myFavProducts;
+  }
 
-  void changeFav(id) {
-    // myProducts.forEach((element) {
-    //   if (element.id == id) {
-    //     element.isFav = !element.isFav;
-    //   }
-    // });
-    // notifyListeners();
+  Future<void> changeFavInMyproduct({ProductId}) async {
+    myProducts.forEach((element) {
+      if (element.id == ProductId) {
+        element.isFav = !element.isFav;
+      }
+    });
+    var p = myProducts.firstWhere((element) => element.id == ProductId);
+    print("----------product fav= ${p.isFav}");
   }
 
   void changeBottonNavigationBar({int newValue}) {
@@ -97,34 +106,6 @@ class DummyData with ChangeNotifier {
   void changePageview(int newValue) {
     currentPageView = newValue;
     notifyListeners();
-  }
-
-  void addToCart({productId, count}) {
-    // print("---------------- proID --- : $productId");
-    // // print("---------------- count --- : $count");
-    // var product = myProducts.firstWhere((element) => element.id == productId);
-    // if (cartProducts.length == 0) {
-    //   cartProducts.add({"product": product, "count": count});
-    // } else {
-    //   for (int i = 0; i < cartProducts.length; i++) {
-    //     if (cartProducts[i]["product"].id.toString() == productId.toString()) {
-    //       isInCart = true;
-    //       break;
-    //     }
-    //   }
-    //   if (!isInCart) {
-    //     cartProducts.add({"product": product, "count": count});
-    //   } else if (isInCart) {
-    //     cartProducts.forEach((element) {
-    //       if (element["product"].id == productId) {
-    //         element["count"] = count;
-    //         isInCart = false;
-    //         return;
-    //       }
-    //     });
-    //   }
-    // }
-    // notifyListeners();
   }
 
   void editOnCart({productId, count}) {
@@ -235,6 +216,10 @@ class DummyData with ChangeNotifier {
       }
     }
     return productByCat;
+  }
+
+  getById(id) {
+    return myProducts.firstWhere((element) => element.id == id);
   }
 
   getBySubCat(String subCategor) {

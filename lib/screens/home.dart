@@ -11,6 +11,7 @@ import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/size_config.dart';
 import 'package:reshop/widgets/home_widgets/cart_widget.dart';
 import 'package:reshop/widgets/home_widgets/categories_widget.dart';
+import 'package:reshop/widgets/home_widgets/offers.dart';
 import 'package:reshop/widgets/home_widgets/profile_widget.dart';
 import 'package:reshop/widgets/product_card.dart';
 import '../providers/dummyData.dart';
@@ -40,7 +41,7 @@ class _HomeState extends State<Home> {
       setState(() {
         _isloading = true;
       });
-      await Provider.of<DummyData>(context).FetchAllProducts();
+      await Provider.of<DummyData>(context).FetchAllProducts(context);
       setState(() {
         _isloading = false;
       });
@@ -56,10 +57,10 @@ class _HomeState extends State<Home> {
     _size.init(context);
     var _oriantation = _size.getOriantation;
     int _currentIndex = provider.bottomNavigationBar;
-    // if (_isFirstTime) {
-    //   _currentIndex = 0;
-    //   _isFirstTime = false;
-    // }
+    if (_isFirstTime) {
+      _currentIndex = 0;
+      _isFirstTime = false;
+    }
 
     var customAppbar = appBarCreator(
         title: Container(
@@ -103,10 +104,15 @@ class _HomeState extends State<Home> {
     var categoriesAppbar = appBarCreator(
         title: Text("Categories",
             style: TextStyle(
-                fontSize: 22,
+                fontSize: 24,
                 color: Colors.black,
-                fontWeight: FontWeight.w500)));
-    var offersAppbar = appBarCreator();
+                fontWeight: FontWeight.bold)));
+    var offersAppbar = appBarCreator(
+        title: Text("Offers",
+            style: TextStyle(
+                fontSize: 24,
+                color: Colors.black,
+                fontWeight: FontWeight.bold)));
     var cartAppbar = appBarCreator(
         title: Text("My Cart",
             style: TextStyle(
@@ -226,7 +232,7 @@ class _HomeState extends State<Home> {
         break;
       case 2:
         {
-          return;
+          return Offers();
         }
         break;
       case 3:

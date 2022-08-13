@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:reshop/constants.dart';
+import 'package:reshop/providers/auth_other.dart';
 import 'package:reshop/providers/auth_signup.dart';
 import 'package:provider/provider.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -36,6 +37,7 @@ class _VerificationState extends State<Verification> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<Auth_SignUp>(context);
+    final auth_other = Provider.of<Auth_other>(context);
     return Scaffold(
       appBar: AppBar(
           leading: IconButton(
@@ -44,7 +46,7 @@ class _VerificationState extends State<Verification> {
                 Navigator.pop(context);
               })),
       body: ModalProgressHUD(
-        inAsyncCall: authProvider.isLoading,
+        inAsyncCall: auth_other.isLoading,
         child: SafeArea(
           child: Container(
             padding: EdgeInsets.all(15),

@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:reshop/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/providers/auth_isloggedin.dart';
+import 'package:reshop/providers/auth_other.dart';
 import 'package:reshop/providers/auth_readwrite.dart';
 import 'package:reshop/providers/auth_signup.dart';
 import 'package:reshop/providers/dummyData.dart';
@@ -19,12 +21,24 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Icon arrowIcon = Icon(Icons.arrow_forward_ios_outlined, size: 18);
   TextStyle listTiteStyle =
       TextStyle(color: myTextFieldBorderColor, fontSize: 16);
-  // String userName = "";
+
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = Provider.of<Auth_IsLoggedin>(context, listen: false);
     final auth_signup = Provider.of<Auth_SignUp>(context, listen: false);
-    //userName= Auth_ReadWrite().localReadUserName();
+    final auth_other = Provider.of<Auth_other>(context, listen: false);
+    var auth = FirebaseAuth.instance;
+    String imgUrl;
+    String userName;
+    var userProvider =
+        FirebaseAuth.instance.currentUser.providerData[0].providerId;
+    if (userProvider == 'google.com' || userProvider == 'facebook.com') {
+      imgUrl = auth.currentUser.providerData[0].photoURL;
+      userName = auth.currentUser.providerData[0].displayName;
+    } else if (userProvider != null) {
+      imgUrl = auth.currentUser.photoURL;
+      userName = auth.currentUser.displayName;
+    }
     return SingleChildScrollView(
       child: Column(children: [
         SizedBox(
@@ -34,24 +48,17 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           children: [
             CircleAvatar(
                 radius: 50,
-                child:
-                    ClipOval(child: Image.asset("assets/images/profile.png"))),
+                backgroundColor: Colors.white,
+                child: ClipOval(
+                    // clipBehavior: Clip.hardEdge,
+                    child: imgUrl != null
+                        ? Image.network(imgUrl)
+                        : Image.asset("assets/images/profile.png"))),
             SizedBox(
               width: 15,
             ),
-            FutureBuilder(
-              future: Auth_ReadWrite().localReadUserName(),
-              builder: ((context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Text("");
-                } else {
-                  return Text(
-                    snapshot.data,
-                    style: TextStyle(fontSize: 24),
-                  );
-                }
-              }),
-            )
+            Text(userName != null ? userName : "",
+                style: TextStyle(fontSize: 22))
           ],
         ),
         SizedBox(
@@ -93,14 +100,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           title: Text("Logout", style: listTiteStyle),
           trailing: arrowIcon,
           onTap: () {
-            isLoggedIn.logOut();
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => AuthScreen()),
-                ModalRoute.withName(AuthScreen.routeName));
-            auth_signup.changeLoadingState(false);
-            Provider.of<DummyData>(context, listen: false).bottomNavigationBar =
-                0;
+            isLoggedIn.logOut(context, auth_other);
           },
         )
       ]),

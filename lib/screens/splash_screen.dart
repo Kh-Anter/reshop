@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/constants.dart';
+import 'package:reshop/providers/auth_readwrite.dart';
 import 'package:reshop/screens/authentication/auth_screen.dart';
 import '../providers/dummyData.dart';
 import '../widgets/build_dot.dart';
@@ -18,11 +19,14 @@ class _SplashScreenState extends State<SplashScreen> {
   final PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
   SizeConfig _size = SizeConfig();
+
   int _index = 0;
   String _btnText = "Next";
+
   @override
   Widget build(BuildContext context) {
     var _dummyData = Provider.of<DummyData>(context);
+    Auth_ReadWrite().localWriteAboutSplash();
     switch (_currentPage) {
       case 0:
         {
