@@ -1,48 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:reshop/enums.dart';
-import 'package:reshop/models/product.dart';
 import 'package:reshop/screens/category_screen/filter_bottomsheet.dart';
 import 'package:reshop/screens/category_screen/sort_bottomsheet.dart';
 import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/widgets/product_card.dart';
-
 import '../../providers/dummyData.dart';
-import '../../constants.dart';
-import '../../size_config.dart';
+import '../../consts/constants.dart';
+import '../../consts/size_config.dart';
 
 class CategoryScreen extends StatefulWidget {
   static const routeName = "/CategoryScreen";
-  String title = "";
-  CategoryScreen({String title, Key key}) : super(key: key);
 
+  const CategoryScreen({Key? key}) : super(key: key);
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  var subCat;
-  var selectedBtn = 0;
-  var all;
-  var other;
-  SizeConfig _size = SizeConfig();
+  String title = "";
+  bool hasSubCat = true;
+  late String subCat;
+  int selectedBtn = 0;
+  late List all;
+  late List other;
+
+  SizeConfig size = SizeConfig();
 
   @override
   Widget build(BuildContext context) {
-    var data = ModalRoute.of(context).settings.arguments;
-    widget.title = data;
-    _size.init(context);
+    final data = ModalRoute.of(context)?.settings.arguments;
+    title = data.toString();
+    if (title == "Best Sellers" || title == "LifeStyle Products") {
+      hasSubCat = false;
+    }
+    size.init(context);
     return Scaffold(
       appBar: appBar(),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
           child: Column(children: [
-            title(),
+            buildTitle(),
             SizedBox(height: 10),
-            subCategory(),
-            SizedBox(height: 10),
-            Container(height: _size.getHeight - 220, child: myGridView()),
+            if (hasSubCat) subCategory(),
+            if (hasSubCat) SizedBox(height: 10),
+            Container(
+                height: hasSubCat ? size.getHeight - 220 : size.getHeight - 180,
+                child: myGridView()),
           ]),
         ),
       ),
@@ -80,29 +84,28 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  Widget title() {
+  Widget buildTitle() {
     return Row(children: [
       Text(
-        widget.title,
+        title,
         style: TextStyle(
           fontSize: 28,
         ),
       ),
       Spacer(),
-      IconButton(
-          onPressed: () => filterBottomSheet(widget.title),
-          icon: Icon(Icons.filter_alt_outlined)),
-      IconButton(
-          onPressed: () => sortButtomSheet(), icon: Icon(Icons.filter_list))
+      if (hasSubCat)
+        IconButton(
+            onPressed: () => filterBottomSheet(title),
+            icon: Icon(Icons.filter_alt_outlined)),
+      if (hasSubCat)
+        IconButton(
+            onPressed: () => sortButtomSheet(), icon: Icon(Icons.filter_list))
     ]);
   }
 
-  Widget subCategory() {
-    var _dummyData = Provider.of<DummyData>(context, listen: false);
-    TextStyle selectedBtnStyle = TextStyle(color: Colors.white);
-    TextStyle unselectedBtnStyle = TextStyle(color: Colors.black26);
-    subCat = _dummyData.subCategories[widget.title];
-    return Container(
+  subCategory() {
+    subCat = Constants.subCategories[title].toString();
+    return SizedBox(
       height: 45,
       child: ListView(
         scrollDirection: Axis.horizontal,
@@ -139,16 +142,28 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  Widget myGridView() {
+  myGridView() {
     var provider = Provider.of<DummyData>(context);
-    if (selectedBtn == 0) {
-      all = provider.getByCategory(widget.title).toList();
+    if (hasSubCat) {
+      if (selectedBtn == 0) {
+        all = provider.getByCategory(title).toList();
+      } else {
+        other = provider.getBySubCat(subCat[selectedBtn]);
+      }
     } else {
-      other = provider.getBySubCat(subCat[selectedBtn]);
+      if (title == "Best Sellers") {
+        all = provider.bestSeller;
+      } else {
+        all = provider.lifeStyle;
+      }
     }
     return GridView.builder(
         scrollDirection: Axis.vertical,
-        itemCount: selectedBtn == 0 ? all.length : other.length,
+        itemCount: !hasSubCat
+            ? all.length
+            : selectedBtn == 0
+                ? all.length
+                : other.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             childAspectRatio: 0.8,
             crossAxisCount: 2,
@@ -156,40 +171,41 @@ class _CategoryScreenState extends State<CategoryScreen> {
             mainAxisSpacing: 8),
         itemBuilder: (BuildContext context, int index) {
           return ProductCart(
-            product: selectedBtn == 0 ? all[index] : other[index],
+            product: !hasSubCat
+                ? all[index]
+                : selectedBtn == 0
+                    ? all[index]
+                    : other[index],
           );
         });
   }
 
   filterBottomSheet(String title) {
-    var dummyData = Provider.of<DummyData>(context, listen: false);
+    // var dummyData = Provider.of<DummyData>(context, listen: false);
     List<String> filterCategory = [];
     List<String> brand = [];
-    brand = List.castFrom(dummyData.brands);
+    brand = List.castFrom(Constants.brands);
     filterCategory.add(title);
-    for (int i = 1; i < dummyData.subCategories[title].length; i++) {
-      filterCategory.add(dummyData.subCategories[title][i]);
+    for (int i = 1; i < Constants.subCategories[title]!.length; i++) {
+      filterCategory.add(Constants.subCategories[title]![i]);
     }
-    return showModalBottomSheet(
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-        context: context,
-        builder: (context) {
-          return FilterBottomSheet(category: filterCategory, brand: brand);
-        });
+    return buttomSheet(
+        FilterBottomSheet(category: filterCategory, brand: brand));
   }
 
   sortButtomSheet() {
-    return showModalBottomSheet(
+    return buttomSheet(SortBottomSheet());
+  }
+
+  buttomSheet(type) {
+    showModalBottomSheet(
         isScrollControlled: true,
         context: context,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20), topRight: Radius.circular(20))),
         builder: (context) {
-          return SortBottomSheet();
+          return type;
         });
   }
 }

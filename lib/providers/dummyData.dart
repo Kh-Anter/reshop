@@ -1,17 +1,11 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:reshop/models/product.dart';
 import 'package:http/http.dart' as http;
-import 'package:reshop/providers/auth_readwrite.dart';
 import 'dart:convert';
-
 import '../models/product.dart';
-import '../enums.dart';
 
 class DummyData with ChangeNotifier {
   List bestSeller = [];
@@ -25,7 +19,8 @@ class DummyData with ChangeNotifier {
   List<Product> myFavProducts = [];
   List<Product> offers = [];
 
-  Future<void> FetchAllProducts(context) async {
+  Future<void> fetchAllProducts(context) async {
+    print("------  enter fetch data ----------");
     offers = [];
     const url =
         "https://reshop-a42f1-default-rtdb.firebaseio.com/products.json";
@@ -33,7 +28,9 @@ class DummyData with ChangeNotifier {
       final result = await http.get(Uri.parse(url));
       final data = json.decode(result.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
-      await FetchAllFav();
+      final List<Product> loadedOffers = [];
+      await fetchAllFav();
+
       data.forEach((prodId, prodData) {
         var prod = Product(
             id: prodData["id"],
@@ -46,147 +43,79 @@ class DummyData with ChangeNotifier {
             subCat: prodData["subCat"],
             images: List.generate(prodData["images"].length,
                 (index) => prodData["images"][index]),
-            isFav: myFavIds.contains(prodData["id"]));
+            isFav: myFavIds.contains(prodData["id"]),
+            off: prodData["off"]);
         loadedProducts.add(prod);
         if (prodData["off"] != null) {
-          offers.add(prod);
-          print("--------off data: ${prodData["off"]}");
+          loadedOffers.add(prod);
         }
-        ;
       });
       myProducts = loadedProducts;
+      offers = loadedOffers;
       notifyListeners();
-      print('---------------- myproductLenght : ${myProducts.length}');
     } on SocketException catch (error) {
       if (error.message == "Connection timed out") {
         print("conneciton time out -----------------");
       }
-    } catch (e) {}
+    } catch (e) {
+      print("----- fetch data error ----- : ${e}");
+    }
   }
 
-  Future<void> FetchAllFav() async {
-    final uid = FirebaseAuth.instance.currentUser.uid;
+  Future<void> fetchAllFav() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
     await FirebaseFirestore.instance
         .collection('users')
         .doc(uid)
         .collection('favourites')
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         myFavIds.add(doc.id);
-      });
+      }
     });
   }
 
   Future<List<Product>> getFavProduct() async {
     myFavProducts = [];
-    myProducts.forEach((element) {
+    for (var element in myProducts) {
       if (element.isFav) {
         myFavProducts.add(element);
       }
-    });
+    }
     return myFavProducts;
   }
 
-  Future<void> changeFavInMyproduct({ProductId}) async {
+  Future<void> changeFavInMyproduct({productId}) async {
+    //for (var element in myProducts) {
     myProducts.forEach((element) {
-      if (element.id == ProductId) {
+      if (element.id == productId) {
         element.isFav = !element.isFav;
       }
     });
-    var p = myProducts.firstWhere((element) => element.id == ProductId);
-    print("----------product fav= ${p.isFav}");
+    //myFavProducts.removeWhere((element) => element.id == productId);
+    // notifyListeners();
   }
 
-  void changeBottonNavigationBar({int newValue}) {
+  void changeBottonNavigationBar({required int newValue}) {
     bottomNavigationBar = newValue;
     notifyListeners();
   }
 
-  void changePageview(int newValue) {
-    currentPageView = newValue;
-    notifyListeners();
-  }
+  // void changePageview(int newValue) {
+  //   currentPageView = newValue;
+  //   notifyListeners();
+  // }
 
-  void editOnCart({productId, count}) {
-    cartProducts.forEach((element) {
-      if (element["product"].id == productId) {
-        element["count"] = count;
-        return;
-      }
-    });
-    notifyListeners();
-  }
-
-  List<Map<String, String>> splashScreen = [
-    {
-      "image": "assets/images/onboarding/onboarding1.png",
-      "title": "Buy whatever you want ",
-      "subtitle":
-          " The biggest online shop so you can find what are you looking for "
-    },
-    {
-      "image": "assets/images/onboarding/onboarding2.png",
-      "title": "Fastest Delivery service",
-      "subtitle":
-          " A wide country branches to give you the best delivery service "
-    },
-    {
-      "image": "assets/images/onboarding/onboarding3.png",
-      "title": "Find Your Perfect Offers",
-      "subtitle":
-          "The biggest online shop so you can find what are you looking for"
-    }
-  ];
-
-  List homePageView = [
-    "assets/images/carousel_card1.png",
-    "assets/images/carousel_card2.png",
-    "assets/images/carousel_card1.png"
-  ];
-
-  List<Map> categories = [
-    {
-      "text": "Electronics",
-      "image": "assets/images/categories/electronics_icon.png"
-    },
-    {"text": "Beauty", "image": "assets/images/categories/beauty_icon1.png"},
-    {"text": "Home", "image": "assets/images/categories/home_icon1.png"},
-    {"text": "Fashion", "image": "assets/images/categories/fashion_icon1.png"},
-    {"text": "Sport", "image": "assets/images/categories/sport_icon.png"},
-    {"text": "Kitchen", "image": "assets/images/categories/kitchen_icon1.png"},
-  ];
-
-  Map<String, List> subCategories = {
-    "Electronics": [
-      "All",
-      "Smart Phones",
-      "Tablets",
-      "Televisions",
-      "Labtops",
-      "Accessories"
-    ],
-    "Beauty": ["All", "Makeup", "Skin care", "Hair care"],
-    "Home": ["All", "Home decore", "Wall art", "Lighting", "Fans"],
-    "Fashion": [
-      "All",
-      "Man's fashion",
-      "Woman's fashion",
-      "Boy's fashion",
-      "Girl's fashion"
-    ],
-    "Sport": [
-      "All",
-      "Running",
-      "Water sport",
-      "Tennis sports",
-      "Golf",
-      "Winter sport",
-    ],
-    "Kitchen": ["All", "Water coolers", "Filters", "Glasses", "Accessories"]
-  };
-
-  List brands = ["Adidas", "Squadra", "MyHome"];
+  // void editOnCart({productId, count}) {
+  //   for (var element in cartProducts) {
+  //     if (element["product"].id == productId) {
+  //       element["count"] = count;
+  //       continue;
+  //     }
+  //   }
+  //   notifyListeners();
+  // }
 
   getBestSellers() {
     myProducts.sort(((a, b) => a.sellCount.compareTo(b.sellCount)));
@@ -194,7 +123,6 @@ class DummyData with ChangeNotifier {
     int index = myProducts.length - lengthOfBestSellers;
     bestSeller = [];
     lifeStyle = [];
-    int maxSellCounter = 0;
     for (int i = 0; i < index; i++) {
       lifeStyle.add(myProducts[i]);
     }

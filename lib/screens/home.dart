@@ -1,87 +1,34 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/rendering.dart';
-import 'package:reshop/constants.dart';
-import 'package:reshop/enums.dart';
-import 'package:reshop/providers/add_products.dart';
-import 'package:reshop/providers/auth_isloggedin.dart';
+import 'package:reshop/consts/constants.dart';
+import '../widgets/loading_widget.dart';
+import 'package:reshop/providers/chart/cart_provider.dart';
 import 'package:reshop/screens/search_screen.dart';
-import 'package:reshop/size_config.dart';
-import 'package:reshop/widgets/home_widgets/cart_widget.dart';
-import 'package:reshop/widgets/home_widgets/categories_widget.dart';
-import 'package:reshop/widgets/home_widgets/offers.dart';
-import 'package:reshop/widgets/home_widgets/profile_widget.dart';
-import 'package:reshop/widgets/product_card.dart';
+import 'package:reshop/consts/size_config.dart';
+import 'package:reshop/inner_screens/home/cart_widget.dart';
+import 'package:reshop/inner_screens/home/categories_widget.dart';
+import 'package:reshop/inner_screens/home/offers.dart';
+import 'package:reshop/inner_screens/home/profile_widget.dart';
 import '../providers/dummyData.dart';
-import '../widgets/build_dot.dart';
-import '../widgets/home_widgets/home_widget.dart';
+import '../inner_screens/home/home_widget.dart';
+import 'package:badges/badges.dart' as badges;
 
 class Home extends StatefulWidget {
   static String routeName = "/Home";
-
+  const Home({Key? key}) : super(key: key);
   @override
-  _HomeState createState() => _HomeState();
+  HomeState createState() => HomeState();
 }
 
-class _HomeState extends State<Home> {
-  bool _isFirstTime = true;
-  bool _isloading = false;
+class HomeState extends State<Home> {
+  bool isloading = false;
   bool init = true;
+  List<Map<String, dynamic>>? pages;
+
   @override
   void initState() {
-    // DummyData.getAllProducts();
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() async {
-    if (init) {
-      setState(() {
-        _isloading = true;
-      });
-      await Provider.of<DummyData>(context).FetchAllProducts(context);
-      setState(() {
-        _isloading = false;
-      });
-    }
-    init = false;
-    super.didChangeDependencies();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = Provider.of<DummyData>(context);
-    SizeConfig _size = SizeConfig();
-    _size.init(context);
-    var _oriantation = _size.getOriantation;
-    int _currentIndex = provider.bottomNavigationBar;
-    if (_isFirstTime) {
-      _currentIndex = 0;
-      _isFirstTime = false;
-    }
-
-    var customAppbar = appBarCreator(
-        title: Container(
-            width: 100,
-            height: 50,
-            child: Image.asset("assets/images/splash.png")),
-        action: [
-          TextButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: ((context) => SearchScreen())));
-              },
-              label: Text("Search",
-                  style: TextStyle(
-                      color: mySecondTextColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal)),
-              icon: Icon(Icons.search, size: 24))
-        ]);
     var homeAppbar = appBarCreator(
-        title: Container(
+        titleWidget: SizedBox(
             width: 100,
             height: 50,
             child: Image.asset("assets/images/splash.png")),
@@ -101,150 +48,139 @@ class _HomeState extends State<Home> {
             icon: Icon(Icons.search, size: 24),
           ),
         ]);
-    var categoriesAppbar = appBarCreator(
-        title: Text("Categories",
-            style: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-                fontWeight: FontWeight.bold)));
-    var offersAppbar = appBarCreator(
-        title: Text("Offers",
-            style: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-                fontWeight: FontWeight.bold)));
-    var cartAppbar = appBarCreator(
-        title: Text("My Cart",
-            style: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-                fontWeight: FontWeight.bold)));
-    var profileAppbar = appBarCreator(
-        title: Text("My Profile",
-            style: TextStyle(
-                fontSize: 24,
-                color: Colors.black,
-                fontWeight: FontWeight.bold)));
+    var categoriesAppbar = appBarCreator(titleTxt: "Categories");
+    var offersAppbar = appBarCreator(titleTxt: "Offers");
+    var cartAppbar = appBarCreator(titleTxt: "My Cart");
+    var profileAppbar = appBarCreator(titleTxt: "My Profile");
+    pages = [
+      {"page": HomeWidget(), "appbar": homeAppbar},
+      {"page": CategoriesWidget(), "appbar": categoriesAppbar},
+      {"page": Offers(), "appbar": offersAppbar},
+      {"page": CartWidget(), "appbar": cartAppbar},
+      {"page": ProfileWidget(), "appbar": profileAppbar},
+    ];
+    super.initState();
+  }
 
-    switch (_currentIndex) {
-      case 0:
-        {
-          customAppbar = homeAppbar;
-        }
-        break;
-      case 1:
-        {
-          customAppbar = categoriesAppbar;
-        }
-        break;
-      case 2:
-        {
-          customAppbar = offersAppbar;
-        }
-        break;
-      case 3:
-        {
-          customAppbar = cartAppbar;
-        }
-        break;
-      case 4:
-        {
-          customAppbar = profileAppbar;
-        }
-        break;
+  @override
+  void didChangeDependencies() async {
+    if (init) {
+      setState(() {
+        isloading = true;
+      });
+
+      await Provider.of<DummyData>(context).fetchAllProducts(context);
+
+      setState(() {
+        isloading = false;
+      });
     }
+    init = false;
+    super.didChangeDependencies();
+  }
 
-    return Scaffold(
-      appBar: customAppbar,
-      bottomNavigationBar: BottomNavigationBar(
-        iconSize: 28,
-        selectedIconTheme: IconThemeData(color: myPrimaryColor),
-        unselectedIconTheme: IconThemeData(color: unselectedNavigationBar),
-        selectedLabelStyle: TextStyle(color: Colors.black),
-        unselectedLabelStyle: TextStyle(color: unselectedNavigationBar),
-        showUnselectedLabels: true,
-        showSelectedLabels: true,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        fixedColor: Colors.black,
-        type: BottomNavigationBarType.fixed,
-        landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-        currentIndex: _currentIndex,
-        onTap: (index) => provider.changeBottonNavigationBar(newValue: index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-            activeIcon: Icon(Icons.home),
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.category_outlined),
-              label: 'Categories',
-              activeIcon: Icon(Icons.category)),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer_outlined),
-              label: 'Offers',
-              activeIcon: Icon(Icons.local_offer)),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart_outlined),
-              label: 'Cart',
-              activeIcon: Icon(Icons.shopping_cart)),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              label: 'Profile',
-              activeIcon: Icon(Icons.person)),
-        ],
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<DummyData>(context, listen: true);
+    Provider.of<CartProvider>(context).readCart(context);
+    SizeConfig size = SizeConfig();
+    size.init(context);
+    int currentIndex = provider.bottomNavigationBar;
+
+    return LoadingWidget(
+      isLoading: isloading,
+      child: Scaffold(
+        appBar: pages![currentIndex]["appbar"],
+        bottomNavigationBar: myBottomNavBar(currentIndex, provider),
+        body: SafeArea(
+          child: child(currentIndex),
+        ),
       ),
-      body: SafeArea(
-          child: _isloading
-              ? Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  child: Center(
-                    child: SizedBox(
-                      width: _size.getWidth - 20,
-                      child: _homeBody(_currentIndex),
-                    ),
-                    //),
-                  ),
-                )),
     );
   }
 
-  AppBar appBarCreator({title, action}) {
+  Widget child(currentIndex) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: SizeConfig.screenWidth - 20,
+        child: pages![currentIndex]["page"],
+      ),
+    );
+  }
+
+  AppBar appBarCreator(
+      {String? titleTxt, List<Widget>? action, Widget? titleWidget}) {
     return AppBar(
-      title: title,
+      title: titleTxt != null
+          ? Text(titleTxt,
+              style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold))
+          : titleWidget,
       actions: action,
       elevation: 0,
     );
   }
 
-  _homeBody(num) {
-    switch (num) {
-      case 0:
-        {
-          return HomeWidget();
-        }
-        break;
-      case 1:
-        {
-          return CategoriesWidget();
-        }
-        break;
-      case 2:
-        {
-          return Offers();
-        }
-        break;
-      case 3:
-        {
-          return CartWidget();
-        }
-        break;
-      case 4:
-        {
-          return ProfileWidget();
-        }
-        break;
-    }
+  BottomNavigationBar myBottomNavBar(int currentIndex, provider) {
+    return BottomNavigationBar(
+      iconSize: 28,
+      selectedIconTheme: IconThemeData(color: myPrimaryColor),
+      unselectedIconTheme: IconThemeData(color: unselectedNavigationBar),
+      selectedLabelStyle: TextStyle(color: Colors.black),
+      unselectedLabelStyle: TextStyle(color: unselectedNavigationBar),
+      showUnselectedLabels: true,
+      showSelectedLabels: true,
+      selectedFontSize: 12,
+      unselectedFontSize: 12,
+      fixedColor: Colors.black,
+      type: BottomNavigationBarType.fixed,
+      landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
+      currentIndex: currentIndex,
+      onTap: (index) {
+        setState(() {
+          provider.bottomNavigationBar = index;
+        });
+      },
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          label: 'Home',
+          activeIcon: Icon(Icons.home),
+        ),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.category_outlined),
+            label: 'Categories',
+            activeIcon: Icon(Icons.category)),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.local_offer_outlined),
+            label: 'Offers',
+            activeIcon: Icon(Icons.local_offer)),
+        BottomNavigationBarItem(
+          label: 'Cart',
+          activeIcon: Icon(Icons.shopping_cart),
+          icon: Consumer<CartProvider>(builder: (context, value, child) {
+            print("-------------->--${value.myCart}");
+            if (value.myCart.isNotEmpty) {
+              return badges.Badge(
+                badgeContent: Text(
+                  value.myCart.length.toString(),
+                  style: TextStyle(color: Colors.white),
+                ),
+                child: Icon(Icons.shopping_cart_outlined),
+              );
+            } else {
+              return Icon(Icons.shopping_cart_outlined);
+            }
+          }),
+        ),
+        BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+            activeIcon: Icon(Icons.person)),
+      ],
+    );
   }
 }

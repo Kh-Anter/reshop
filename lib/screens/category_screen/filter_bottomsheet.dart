@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:reshop/constants.dart';
-import 'package:reshop/size_config.dart';
+import 'package:reshop/consts/constants.dart';
+import 'package:reshop/consts/size_config.dart';
 
 class FilterBottomSheet extends StatefulWidget {
-  List<String> category;
-  List<String> brand;
-  FilterBottomSheet({@required this.category, @required this.brand});
+  final List<String> category;
+  final List<String> brand;
+  const FilterBottomSheet(
+      {Key? key, required this.category, required this.brand})
+      : super(key: key);
 
   @override
   State<FilterBottomSheet> createState() => _FilterBottomSheetState();
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  SizeConfig _size = SizeConfig();
+  SizeConfig size = SizeConfig();
   GlobalKey categoryKey = GlobalKey();
   GlobalKey brandKey = GlobalKey();
-  RangeValues _rangeValues = RangeValues(3000, 20000);
+  RangeValues _rangeValues = RangeValues(0, 50000);
   String dropdownValueForCate = "";
   String dropdownValueForBrand = "";
   @override
@@ -28,14 +30,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    _size.init(context);
+    size.init(context);
     return Container(
       padding: EdgeInsets.all(20),
-      height: _size.getHeight - (_size.getHeight / 3),
+      height: size.getHeight - (size.getHeight / 3),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Stack(alignment: Alignment.topCenter, children: [
           Container(
-            width: _size.getWidth - 20,
+            width: size.getWidth - 20,
             alignment: Alignment.topCenter,
             child: Text(
               "Filters",
@@ -86,7 +88,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: myDropDownButton(widget.category, categoryKey)),
         Container(
           height: 10,
-          width: _size.getWidth,
+          width: size.getWidth,
           child: Divider(
             endIndent: 15,
             thickness: 1,
@@ -118,7 +120,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: myDropDownButton(widget.brand, brandKey)),
         Container(
           height: 10,
-          width: _size.getWidth,
+          width: size.getWidth,
           child: Divider(
             endIndent: 15,
             thickness: 1,
@@ -166,8 +168,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
-                width: (_size.getWidth - 40) / 2,
-                height: _size.getProportionateScreenHeight(60),
+                width: (size.getWidth - 40) / 2,
+                height: size.getProportionateScreenHeight(60),
                 child: TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -177,8 +179,8 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                       style: TextStyle(fontSize: 17),
                     ))),
             Container(
-                width: (_size.getWidth - 40) / 2,
-                height: _size.getProportionateScreenHeight(60),
+                width: (size.getWidth - 40) / 2,
+                height: size.getProportionateScreenHeight(60),
                 child: ElevatedButton(
                     style: ButtonStyle(
                         backgroundColor:
@@ -210,15 +212,19 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             child: Padding(
                 padding: EdgeInsets.only(left: 30), child: Text(value)));
       }).toList(),
-      onChanged: (String newValue) {
+      onChanged: (String? newValue) {
         setState(() {
           if (key == categoryKey) {
-            dropdownValueForCate = newValue;
+            dropdownValueForCate = newValue!;
           } else {
-            dropdownValueForBrand = newValue;
+            dropdownValueForBrand = newValue!;
           }
         });
       },
     );
+  }
+
+  apply() {
+    // Navigator.of(context).popAndPushNamed();
   }
 }

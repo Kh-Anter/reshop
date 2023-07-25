@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:reshop/constants.dart';
-import 'package:reshop/size_config.dart';
+import 'package:reshop/consts/constants.dart';
+import 'package:reshop/providers/dummyData.dart';
+import 'package:reshop/consts/size_config.dart';
+import 'package:provider/provider.dart';
+import 'package:reshop/widgets/product_card.dart';
 
 class SearchScreen extends StatefulWidget {
   static const routeName = "/SearchScreen";
-  const SearchScreen({Key key}) : super(key: key);
+  const SearchScreen({Key? key}) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  var dummyData;
+  List searchResult = [];
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    dummyData = Provider.of<DummyData>(context, listen: false);
+  }
+
+  TextEditingController searchCtl = TextEditingController();
   List recentSearch = [
     "All",
     "Smart Phones",
@@ -21,30 +33,39 @@ class _SearchScreenState extends State<SearchScreen> {
     "Men fashion"
   ];
   var selectedBtn = "";
-  SizeConfig _size = SizeConfig();
+  SizeConfig size = SizeConfig();
 
   @override
   Widget build(BuildContext context) {
-    _size.init(context);
+    size.init(context);
     return Scaffold(
       appBar: myAppbar(),
-      body: SafeArea(
-          child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(right: 15, left: 15),
+      body: Padding(
+        padding: EdgeInsets.only(left: 5, right: 5),
+        child: SingleChildScrollView(
+          //  controller: controller,
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Container(
               margin: EdgeInsets.only(top: 30, bottom: 15),
+              //height: 10,
               child: Text(
-                "Recent Search",
+                "  Recent Search",
                 style: TextStyle(color: myTextFieldBorderColor),
               ),
             ),
             createRecentSearch(),
+            SizedBox(
+              height: 15,
+            ),
+            if (searchResult.isNotEmpty)
+              SizedBox(
+                height: size.getHeight - 300,
+                child: buildSearchResult(context),
+              ),
           ]),
         ),
-      )),
+      ),
     );
   }
 
@@ -52,33 +73,27 @@ class _SearchScreenState extends State<SearchScreen> {
     return AppBar(
       leadingWidth: 75,
       leading: IconButton(
-        alignment: Alignment.bottomCenter,
-        icon: Icon(
-          Icons.arrow_back_ios,
-          size: 26,
-        ),
-        onPressed: (() {
-          Navigator.pop(context);
-        }),
-      ),
+          alignment: Alignment.bottomCenter,
+          icon: Icon(
+            Icons.arrow_back_ios,
+            size: 26,
+          ),
+          onPressed: () => Navigator.pop(context)),
       actions: [
         Container(
           alignment: Alignment.center,
-          width: _size.getWidth - 70,
+          width: size.getWidth - 70,
           padding: EdgeInsets.only(left: 10, right: 1),
           margin: EdgeInsets.only(top: 10, right: 15, left: 10),
           decoration: BoxDecoration(
               color: myTextFieldBackgroundColor,
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: TextField(
-            onTap: () {},
+            controller: searchCtl,
+            onChanged: (newVal) => search(),
             decoration: InputDecoration(
               hintText: "Search",
-              icon: Icon(
-                Icons.search,
-                size: 24,
-                color: myPrimaryColor,
-              ),
+              icon: Icon(Icons.search, size: 24, color: myPrimaryColor),
               border: InputBorder.none,
             ),
           ),
@@ -108,6 +123,7 @@ class _SearchScreenState extends State<SearchScreen> {
             onPressed: () {
               setState(() {
                 selectedBtn = recentSearch[index];
+                recent();
               });
             },
             child: Text(recentSearch[index],
@@ -116,5 +132,63 @@ class _SearchScreenState extends State<SearchScreen> {
                     : null)),
       );
     }));
+  }
+
+  Widget buildSearchResult(context) {
+    return GridView.builder(
+        physics: ScrollPhysics(),
+        //physics: NeverScrollableScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        itemCount: searchResult.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            childAspectRatio: 0.8,
+            crossAxisCount: 2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8),
+        itemBuilder: (BuildContext context, int index) {
+          return ProductCart(
+            product: searchResult[index],
+          );
+        });
+  }
+
+  search() {
+    var newKey = searchCtl.text.toString().trim();
+    int len = dummyData.myProducts.length;
+    List searchResult2 = [];
+    if (newKey != "") {
+      selectedBtn = "";
+      for (int i = 0; i < len; i++) {
+        if (dummyData.myProducts[i].title.contains(newKey) ||
+            dummyData.myProducts[i].description.contains(newKey) ||
+            dummyData.myProducts[i].subCat.contains(newKey)) {
+          searchResult2.add(dummyData.myProducts[i]);
+        }
+      }
+      searchResult = searchResult2;
+    } else {
+      searchResult = [];
+    }
+    setState(() {});
+  }
+
+  recent() {
+    int len = dummyData.myProducts.length;
+    List searchResult2 = [];
+    if (selectedBtn != "") {
+      if (selectedBtn == "All") {
+        searchResult = dummyData.myProducts;
+      } else {
+        for (int i = 0; i < len; i++) {
+          if (dummyData.myProducts[i].subCat == selectedBtn) {
+            searchResult2.add(dummyData.myProducts[i]);
+          }
+        }
+        searchResult = searchResult2;
+      }
+    } else {
+      searchResult = [];
+    }
+    setState(() {});
   }
 }
