@@ -1,76 +1,68 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:reshop/constants.dart';
+import 'package:reshop/consts/constants.dart';
 import 'package:provider/provider.dart';
-import 'package:reshop/providers/auth_other.dart';
-import 'package:reshop/size_config.dart';
-import 'package:reshop/widgets/auth_widgets/signin_widget.dart';
-import 'package:reshop/widgets/auth_widgets/signup_widget.dart';
-
-import '../../providers/auth_signup.dart';
+import 'package:reshop/providers/authentication/auth_other.dart';
+import 'package:reshop/consts/size_config.dart';
+import 'package:reshop/providers/loading_provider.dart';
+import 'package:reshop/widgets/loading_widget.dart';
+import '../../inner_screens/auth/signin_widget.dart';
+import '../../inner_screens/auth/signup_widget.dart';
 
 class AuthScreen extends StatefulWidget {
   static String routeName = "/AuthScreen";
-  const AuthScreen({Key key}) : super(key: key);
+  const AuthScreen({Key? key}) : super(key: key);
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  TextStyle selected = TextStyle(
-      color: Colors.black,
-      fontSize: 34,
-      fontWeight: FontWeight.bold,
-      decoration: TextDecoration.underline);
-  TextStyle unselected = TextStyle(
-    color: mySecondTextColor,
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
-  );
-  SizeConfig _sizeConfig = SizeConfig();
+  SizeConfig sizeConfig = SizeConfig();
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<Auth_SignUp>(context);
-    final auth_other = Provider.of<Auth_other>(context);
-    _sizeConfig.init(context);
+    final authOther = Provider.of<AuthOther>(context);
+    sizeConfig.init(context);
 
     return Scaffold(
-      body: ModalProgressHUD(
-        inAsyncCall: auth_other.isLoading,
-        child: SafeArea(
-          child: Container(
-            padding: EdgeInsets.all(10),
-            child: SingleChildScrollView(
-              child: Column(children: [
-                SizedBox(
-                  height: _sizeConfig.getProportionateScreenHeight(50),
-                ),
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  TextButton(
+      body: Selector<LoadingProvider, bool>(
+        selector: (context, loadingProvider) => loadingProvider.authLoading,
+        builder: (context, value, child) => LoadingWidget(
+          isLoading: value,
+          child: SafeArea(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: SingleChildScrollView(
+                child: Column(children: [
+                  SizedBox(height: sizeConfig.getProportionateScreenHeight(50)),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    TextButton(
+                        onPressed: () {
+                          if (!authOther.isSignIn) {
+                            authOther.changeAuthState(true);
+                          }
+                        },
+                        child: Text(
+                          "Sign in",
+                          style: authOther.isSignIn
+                              ? selectedTitleStyle
+                              : unselectedTitleStyle,
+                        )),
+                    TextButton(
                       onPressed: () {
-                        if (!auth_other.isSignIn) {
-                          auth_other.changeAuthState(true);
+                        if (authOther.isSignIn) {
+                          authOther.changeAuthState(false);
                         }
                       },
-                      child: Text(
-                        "Sign in",
-                        style: auth_other.isSignIn ? selected : unselected,
-                      )),
-                  TextButton(
-                    onPressed: () {
-                      if (auth_other.isSignIn) {
-                        auth_other.changeAuthState(false);
-                      }
-                    },
-                    child: Text("Sign up",
-                        style: auth_other.isSignIn ? unselected : selected),
-                  )
+                      child: Text("Sign up",
+                          style: authOther.isSignIn
+                              ? unselectedTitleStyle
+                              : selectedTitleStyle),
+                    )
+                  ]),
+                  authOther.isSignIn ? SigninWidget() : SignupWidget(),
                 ]),
-                auth_other.isSignIn ? SigninWidget() : SignupWidget(),
-              ]),
+              ),
             ),
           ),
         ),

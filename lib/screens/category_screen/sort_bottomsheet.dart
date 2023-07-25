@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:reshop/constants.dart';
-import 'package:reshop/size_config.dart';
+import 'package:reshop/consts/constants.dart';
+import 'package:reshop/consts/size_config.dart';
 
 class SortBottomSheet extends StatefulWidget {
-  const SortBottomSheet({Key key}) : super(key: key);
+  const SortBottomSheet({Key? key}) : super(key: key);
 
   @override
   State<SortBottomSheet> createState() => _SortBottomSheetState();
 }
 
 class _SortBottomSheetState extends State<SortBottomSheet> {
-  SizeConfig _size = SizeConfig();
+  SizeConfig size = SizeConfig();
   var selectedVal = 1;
   @override
   Widget build(BuildContext context) {
-    _size.init(context);
+    size.init(context);
     return Container(
         padding: EdgeInsets.all(20),
-        height: _size.getHeight - (_size.getHeight / 3),
+        height: size.getHeight - (size.getHeight / 3),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Stack(alignment: Alignment.topCenter, children: [
             Container(
-              width: _size.getWidth - 20,
+              width: size.getWidth - 20,
               alignment: Alignment.topCenter,
               child: Text(
                 "Sort by",
@@ -54,8 +54,8 @@ class _SortBottomSheetState extends State<SortBottomSheet> {
           myRadioButtons("Price : Low to High", 4),
           Spacer(),
           Container(
-              width: _size.getWidth - 40,
-              height: _size.getProportionateScreenHeight(60),
+              width: size.getWidth - 40,
+              height: size.getProportionateScreenHeight(60),
               child: ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor:
@@ -81,9 +81,9 @@ class _SortBottomSheetState extends State<SortBottomSheet> {
         Radio(
           value: value,
           groupValue: selectedVal,
-          onChanged: (newValue) {
+          onChanged: (int? newValue) {
             setState(() {
-              selectedVal = newValue;
+              selectedVal = newValue!;
             });
           },
         )

@@ -1,34 +1,30 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:reshop/constants.dart';
-import 'package:reshop/models/product.dart';
-import 'package:reshop/providers/auth_readwrite.dart';
+import 'package:reshop/consts/constants.dart';
+import 'package:reshop/providers/authentication/auth_readwrite.dart';
+// import 'package:reshop/providers/favourites.dart';
 import 'package:reshop/widgets/product_card.dart';
-
 import '../providers/dummyData.dart';
-import '../size_config.dart';
+import '../consts/size_config.dart';
 
 class FavouritesScreen extends StatefulWidget {
   static const routeName = "/favouritesScreen";
-  const FavouritesScreen({Key key}) : super(key: key);
+  const FavouritesScreen({Key? key}) : super(key: key);
 
   @override
   State<FavouritesScreen> createState() => _FavouritesScreenState();
 }
 
 class _FavouritesScreenState extends State<FavouritesScreen> {
-  SizeConfig _size = SizeConfig();
+  SizeConfig size = SizeConfig();
 
   @override
   Widget build(BuildContext context) {
-    final _auth_readwrite = Provider.of<Auth_ReadWrite>(context);
-    final _dummyData = Provider.of<DummyData>(context, listen: false);
-
-    var auth = FirebaseAuth.instance;
-
-    _size.init(context);
+    final authReadwrite = Provider.of<AuthReadWrite>(context);
+    final dummyData = Provider.of<DummyData>(context, listen: false);
+    // final favouritesProvider = Provider.of<FavouritesProvider>(context);
+    size.init(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -44,28 +40,25 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
       ),
       body: Padding(
           padding: EdgeInsets.all(10),
-          child: getFavourites(_auth_readwrite, _dummyData, auth)),
+          child: getFavourites(authReadwrite, dummyData)),
     );
   }
 
-  Widget getFavourites(_auth_readwrite, _dummyData, auth) {
+  Widget getFavourites(authReadwrite, dummyData) {
     return FutureBuilder(
-      future: _dummyData.getFavProduct(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text("Something went wrong");
-        }
+      future: dummyData.getFavProduct(),
+      builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
+        } else if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.data.length == 0) {
-            return buildEmptyFav(_dummyData);
+            return buildEmptyFav(dummyData);
           } else {
             return buildFav(snapshot.data);
           }
+        } else {
+          return Text("Something went wrong");
         }
-        return null;
       },
     );
   }
@@ -86,7 +79,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
         });
   }
 
-  Widget buildEmptyFav(_dummyData) {
+  Widget buildEmptyFav(dummyData) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +113,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
           ),
           Container(
             margin: EdgeInsets.all(30),
-            width: _size.getWidth / 2,
+            width: size.getWidth / 2,
             height: 45,
             child: ElevatedButton(
                 style: ButtonStyle(
@@ -128,7 +121,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         borderRadius: BorderRadius.circular(10)))),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _dummyData.changeBottonNavigationBar(newValue: 0);
+                  dummyData.changeBottonNavigationBar(newValue: 0);
                 },
                 child: Text(
                   "Continue Shopping",
