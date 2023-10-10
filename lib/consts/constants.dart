@@ -50,7 +50,7 @@ class Constants {
   };
 
   static List brands = ["Adidas", "Squadra", "MyHome"];
-  static List<Map> categories = [
+  static List<Map<String, String>> categories = [
     {
       "text": "Electronics",
       "image": "assets/images/categories/electronics_icon.png"
@@ -61,6 +61,7 @@ class Constants {
     {"text": "Sport", "image": "assets/images/categories/sport_icon.png"},
     {"text": "Kitchen", "image": "assets/images/categories/kitchen_icon1.png"},
   ];
+
   static List<Map<String, String>> splashScreen = [
     {
       "image": "assets/images/onboarding/onboarding1.png",

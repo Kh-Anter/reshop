@@ -4,7 +4,7 @@ import 'package:reshop/providers/orders_provider.dart';
 import 'package:reshop/consts/size_config.dart';
 import 'package:provider/provider.dart';
 // import 'package:reshop/widgets/orders_widgets/empty_orders.dart';
-import 'package:reshop/widgets/orders_widgets/order_widget.dart';
+import 'package:reshop/inner_screens/orders/order_widget.dart';
 
 class Orders extends StatefulWidget {
   const Orders({Key? key}) : super(key: key);
@@ -52,7 +52,7 @@ class _OrdersState extends State<Orders> {
                     }),
                     labelStyle: TextStyle(
                         color: Colors.black,
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500),
                     unselectedLabelColor: mySecondTextColor,
                     labelColor: Colors.black,
@@ -66,10 +66,12 @@ class _OrdersState extends State<Orders> {
                     ]),
               ),
             ),
-            SingleChildScrollView(
-              child: SizedBox(
-                height: size.getHeight - 150,
-                child: OrderWidget(isDeliverd),
+            Expanded(
+              child: SingleChildScrollView(
+                child: SizedBox(
+                  height: size.getHeight - 150,
+                  child: OrderWidget(isDeliverd),
+                ),
               ),
             ),
           ],

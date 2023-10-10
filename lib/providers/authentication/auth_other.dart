@@ -45,7 +45,7 @@ class AuthOther with ChangeNotifier {
 
   static Future<bool> isPhoneNumberAlreadyRegistered(String phoneNumber) async {
     final data = await ConnectFirebase.realtimeRead(path: "users");
-    if (data == null) return false;
+    if (data == null || data == "") return false;
     for (var value in data.values) {
       if (value["phoneNum"] == phoneNumber) {
         return true;

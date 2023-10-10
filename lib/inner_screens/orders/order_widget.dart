@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:reshop/consts/constants.dart';
 import 'package:reshop/providers/orders_provider.dart';
 import 'package:reshop/consts/size_config.dart';
-import 'package:reshop/widgets/orders_widgets/empty_orders.dart';
+import 'package:reshop/inner_screens/orders/empty_orders.dart';
 
 class OrderWidget extends StatefulWidget {
   final bool isDeliverd;
-  OrderWidget(this.isDeliverd, {Key? key}) : super(key: key);
+  const OrderWidget(this.isDeliverd, {Key? key}) : super(key: key);
 
   @override
   State<OrderWidget> createState() => _OrderWidgetState();
@@ -69,7 +69,7 @@ class _OrderWidgetState extends State<OrderWidget> {
                                   result[i]["items"][rI]["itemName"],
                                   style: const TextStyle(
                                       overflow: TextOverflow.ellipsis,
-                                      fontSize: 18,
+                                      fontSize: 15,
                                       color: mySecondTextColor),
                                 ),
                               ),
@@ -79,7 +79,7 @@ class _OrderWidgetState extends State<OrderWidget> {
                       ),
                     ),
                     Text("X${result[i]["items"][rI]["count"]}",
-                        style: const TextStyle(fontSize: 18))
+                        style: const TextStyle(fontSize: 15))
                   ],
                 );
               },
@@ -116,7 +116,7 @@ class _OrderWidgetState extends State<OrderWidget> {
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                               color: mySecondTextColor)),
-                      Text(result[i]["total"].toString() + " LE ",
+                      Text("${result[i]["total"]} LE ",
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -133,21 +133,21 @@ class _OrderWidgetState extends State<OrderWidget> {
     );
   }
 
-  Widget myAlertDialog(onpress_continue) {
-    String txt = "";
-    // if (controller.role == 0)
-    txt = "Are you sure , you want to cancel order ?";
-    return AlertDialog(
-      content: Text(txt),
-      actions: [
-        TextButton(
-            child: Text("Cancel"),
-            onPressed: () => Navigator.of(context).pop()),
-        TextButton(
-          child: Text("Continue"),
-          onPressed: onpress_continue,
-        )
-      ],
-    );
-  }
+  // Widget myAlertDialog(onpress_continue) {
+  //   String txt = "";
+  //   // if (controller.role == 0)
+  //   txt = "Are you sure , you want to cancel order ?";
+  //   return AlertDialog(
+  //     content: Text(txt),
+  //     actions: [
+  //       TextButton(
+  //           child: Text("Cancel"),
+  //           onPressed: () => Navigator.of(context).pop()),
+  //       TextButton(
+  //         child: Text("Continue"),
+  //         onPressed: onpress_continue,
+  //       )
+  //     ],
+  //   );
+  // }
 }

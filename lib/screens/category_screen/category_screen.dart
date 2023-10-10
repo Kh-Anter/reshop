@@ -19,11 +19,11 @@ class CategoryScreen extends StatefulWidget {
 class _CategoryScreenState extends State<CategoryScreen> {
   String title = "";
   bool hasSubCat = true;
-  late String subCat;
+  late List subCat;
   int selectedBtn = 0;
   late List all;
   late List other;
-
+ 
   SizeConfig size = SizeConfig();
 
   @override
@@ -104,7 +104,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   subCategory() {
-    subCat = Constants.subCategories[title].toString();
+    subCat = Constants.subCategories[title] as List;
     return SizedBox(
       height: 45,
       child: ListView(

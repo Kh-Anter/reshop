@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/consts/constants.dart';
-import 'package:reshop/providers/authentication/auth_readwrite.dart';
+import 'package:reshop/providers/address_provider.dart';
 // import 'package:reshop/providers/favourites.dart';
 import 'package:reshop/widgets/product_card.dart';
 import '../providers/dummyData.dart';
@@ -21,7 +21,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authReadwrite = Provider.of<AuthReadWrite>(context);
+    final authReadwrite = Provider.of<AddressProvider>(context);
     final dummyData = Provider.of<DummyData>(context, listen: false);
     // final favouritesProvider = Provider.of<FavouritesProvider>(context);
     size.init(context);

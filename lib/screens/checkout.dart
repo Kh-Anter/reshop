@@ -2,13 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:reshop/consts/constants.dart';
 import 'package:reshop/consts/enums.dart';
-import 'package:reshop/models/validations.dart';
-import 'package:reshop/providers/authentication/auth_readwrite.dart';
+import 'package:reshop/providers/address_provider.dart';
+import 'package:reshop/providers/dummyData.dart';
+
 import 'package:reshop/providers/orders_provider.dart';
+import 'package:reshop/screens/editOrAdd_address.dart';
 import 'package:reshop/screens/home.dart';
 import 'package:reshop/consts/size_config.dart';
 import 'package:provider/provider.dart';
-import 'package:reshop/widgets/mytextfield.dart';
+import 'package:reshop/screens/orders.dart';
 
 class CheckOut extends StatefulWidget {
   static const routeName = "checkout";
@@ -20,33 +22,33 @@ class CheckOut extends StatefulWidget {
 }
 
 class _CheckOutState extends State<CheckOut> {
-  final titleCtl = TextEditingController();
-  final nameCtl = TextEditingController();
-  final addressCtl = TextEditingController();
-  final phoneCtl = TextEditingController();
-  var globalKey = GlobalKey<FormState>();
-  bool loading = false;
-  String titleError = "";
-  String nameError = "";
-  String addressError = "";
-  String phoneError = "";
+  // final titleCtl = TextEditingController();
+  // final nameCtl = TextEditingController();
+  // final addressCtl = TextEditingController();
+  // final phoneCtl = TextEditingController();
+  // var globalKey = GlobalKey<FormState>();
+  // bool loading = false;
+  // String titleError = "";
+  // String nameError = "";
+  // String addressError = "";
+  // String phoneError = "";
   Payment payMethodVal = Payment.onReceived;
   int addressVal = 0;
   final SizeConfig _size = SizeConfig();
-  late dynamic authReadWrite;
+  late dynamic addressProvider;
 
   @override
   void initState() {
     callSizeConfig();
     super.initState();
-    authReadWrite = Provider.of<AuthReadWrite>(context, listen: false);
+    addressProvider = Provider.of<AddressProvider>(context, listen: false);
   }
 
   void callSizeConfig() async {
     await Future.delayed(Duration(seconds: 1), () => _size.init(context));
   }
 
-  late final Future readAddress = authReadWrite.readAddress();
+  late final Future readAddress = addressProvider.readAddress();
   @override
   Widget build(BuildContext context) {
     ElevatedButton(
@@ -87,12 +89,12 @@ class _CheckOutState extends State<CheckOut> {
       StatefulBuilder(
         builder: (context, setState) => Column(
             children: List.generate(
-                authReadWrite.userAddress.length,
+                addressProvider.userAddress.length,
                 ((index) => buildAddress(
-                    authReadWrite.userAddress[index]["title"],
-                    authReadWrite.userAddress[index]["address"],
-                    authReadWrite.userAddress[index]["name"],
-                    authReadWrite.userAddress[index]["phoneNum"],
+                    addressProvider.userAddress[index]["title"],
+                    addressProvider.userAddress[index]["address"],
+                    addressProvider.userAddress[index]["name"],
+                    addressProvider.userAddress[index]["phoneNum"],
                     index,
                     setState)))),
       ),
@@ -107,16 +109,8 @@ class _CheckOutState extends State<CheckOut> {
   Widget addAddressBtn() {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       TextButton(
-          onPressed: () => showModalBottomSheet(
-              context: context,
-              // useRootNavigator: fa,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20))),
-              builder: (context) => StatefulBuilder(
-                  builder: (context, setModalState) =>
-                      myBottomSheet(setModalState))),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(EditOrAddAddress.routeName),
           child: Text("Add new address",
               style: TextStyle(fontSize: 16, color: myPrimaryColor)))
     ]);
@@ -133,7 +127,7 @@ class _CheckOutState extends State<CheckOut> {
                   borderRadius: BorderRadius.circular(10)))),
           onPressed: () => showDialog(
               context: context,
-              builder: (context) => authReadWrite.userAddress.length == 0
+              builder: (context) => addressProvider.userAddress.length == 0
                   ? AlertDialog(title: Text("add your address!"), actions: [
                       TextButton(
                           onPressed: () => Navigator.of(context).pop(),
@@ -156,39 +150,17 @@ class _CheckOutState extends State<CheckOut> {
                                   Provider.of<OrderProvider>(context);
                               return orderProvider.addOrderProgress
                                   ? SizedBox(
-                                      width: 30,
-                                      height: 30,
+                                      width: 25,
+                                      height: 25,
                                       child: CircularProgressIndicator())
                                   : ElevatedButton(
                                       onPressed: () => orderProvider
                                           .addNewOrder(
-                                              authReadWrite
+                                              addressProvider
                                                   .userAddress[addressVal],
                                               context)
-                                          .then((_) => AlertDialog(
-                                                title: Text(
-                                                    "Done, order in processing "),
-                                                actions: [
-                                                  SizedBox(
-                                                      width: 30,
-                                                      height: 30,
-                                                      child: ElevatedButton(
-                                                          child: Text(
-                                                              "Containue shopping"),
-                                                          onPressed: () => Navigator
-                                                                  .of(context)
-                                                              .pushNamedAndRemoveUntil(
-                                                                  Home
-                                                                      .routeName,
-                                                                  (route) =>
-                                                                      false))),
-                                                  TextButton(
-                                                      onPressed: () {},
-                                                      // Navigator.of(context)
-                                                      //     .pushAndRemoveUntil(Home.routeName, (route) => false),
-                                                      child: Text("See Orders"))
-                                                ],
-                                              )),
+                                          .then(
+                                              (_) => afterAddingOrder(context)),
                                       child: Text("Confirm"));
                             },
                           ),
@@ -201,6 +173,49 @@ class _CheckOutState extends State<CheckOut> {
             style: TextStyle(fontSize: 16),
           )),
     );
+  }
+
+  Future<dynamic> afterAddingOrder(BuildContext context) {
+    final dummyData = Provider.of<DummyData>(context, listen: false);
+    Navigator.of(context).pop();
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+              title: Row(
+                children: const [
+                  Icon(
+                    Icons.done_all,
+                    color: Colors.green,
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    "Done, order in processing",
+                    style: TextStyle(fontSize: 16),
+                  )
+                ],
+              ),
+              actions: [
+                SizedBox(
+                    child: ElevatedButton(
+                        child: Text("shopping"),
+                        onPressed: () {
+                          dummyData.changeBottonNavigationBar(newValue: 0);
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              Home.routeName, (route) => false);
+                        })),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        Home.routeName,
+                        (route) => true,
+                      );
+                      dummyData.changeBottonNavigationBar(newValue: 0);
+                      Navigator.of(context).pushNamed(Orders.routeName);
+                    },
+                    child: Text("See Orders"))
+              ],
+            ));
   }
 
   Widget buildAddress(String title, String address, String userName,
@@ -297,177 +312,177 @@ class _CheckOutState extends State<CheckOut> {
     );
   }
 
-  Widget myBottomSheet(setModalState) {
-    validateForm();
-    return Container(
-      padding: EdgeInsets.only(top: 20, bottom: 10, left: 20, right: 20),
-      height: _size.getHeight * 0.6,
-      child: Column(children: [
-        Stack(alignment: Alignment.topCenter, children: [
-          Container(
-              alignment: Alignment.topCenter,
-              child: Text("Add new address",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300))),
-          Positioned(
-            right: 0,
-            top: 0,
-            child: InkWell(
-                onTap: () => Navigator.of(context).pop(),
-                child: Icon(
-                  Icons.close_rounded,
-                  size: 25,
-                  color: Colors.black,
-                )),
-          )
-        ]),
-        Container(
-          padding: EdgeInsets.only(top: 20),
-          height: (_size.getHeight * 0.6) - 100,
-          child: SingleChildScrollView(
-            child: Form(
-              key: globalKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MyTextField(
-                      labelText: "Title",
-                      maxLength: 10,
-                      controller: titleCtl,
-                      parentState: setModalState,
-                      validator: (value) {
-                        if (value.toString().trim().isEmpty) {
-                          setModalState(() => titleError = "enter a title");
-                        }
-                      }),
-                  if (titleError.isNotEmpty) error(titleError),
-                  MyTextField(
-                      labelText: "Name",
-                      maxLength: 20,
-                      controller: nameCtl,
-                      parentState: setModalState,
-                      validator: (value) {
-                        if (value.toString().trim().isEmpty) {
-                          setModalState(() => nameError = "enter a name");
-                        }
-                      }),
-                  if (nameError.isNotEmpty) error(nameError),
-                  MyTextField(
-                      labelText: "Address",
-                      controller: addressCtl,
-                      parentState: setModalState,
-                      validator: (value) {
-                        if (value.toString().trim().length < 10) {
-                          setModalState(() => addressError =
-                              "address must be at least 10 char.");
-                        }
-                      }),
-                  if (addressError.isNotEmpty) error(addressError),
-                  MyTextField(
-                      labelText: "Phone number",
-                      type: TextInputType.phone,
-                      controller: phoneCtl,
-                      parentState: setModalState,
-                      validator: (value) {
-                        if (!Validations.validatePhone(phone: value)) {
-                          setModalState(
-                              () => phoneError = "Invalid phone number");
-                        }
-                      },
-                      maxLength: 11,
-                      prefex: Text("+2 ", style: TextStyle(fontSize: 14))),
-                  if (phoneError.isNotEmpty) error(phoneError),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Row(children: [
-                    SizedBox(
-                        width: (_size.getWidth - 40) / 2,
-                        height: _size.getProportionateScreenHeight(60),
-                        child: TextButton(
-                            onPressed: () {
-                              zeroError();
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Cancel",
-                                style: TextStyle(fontSize: 17)))),
-                    SizedBox(
-                      width: (_size.getWidth - 40) / 2,
-                      height: _size.getProportionateScreenHeight(50),
-                      child: loading
-                          ? Center(child: CircularProgressIndicator())
-                          : ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(myPrimaryColor),
-                                  shape: MaterialStateProperty.all(
-                                      RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)))),
-                              onPressed: () {
-                                // setState(() => loading = true);
-                                loading = true;
-                                setModalState(() {
-                                  if (validateForm()) {
-                                    authReadWrite.addAddress(
-                                        title: titleCtl.text,
-                                        address: addressCtl.text,
-                                        name: nameCtl.text,
-                                        phoneNum: phoneCtl.text);
-                                    Navigator.of(context).pop();
-                                    zeroError();
-                                    setState(() {});
-                                  }
-                                  loading = false;
-                                });
-                              },
-                              child: Text(
-                                "Add",
-                                style: TextStyle(fontSize: 17),
-                              )),
-                    )
-                  ]),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ]),
-    );
-  }
+  // Widget myBottomSheet(setModalState) {
+  //   validateForm();
+  //   return Container(
+  //     padding: EdgeInsets.only(top: 20, bottom: 10, left: 20, right: 20),
+  //     height: _size.getHeight * 0.6,
+  //     child: Column(children: [
+  //       Stack(alignment: Alignment.topCenter, children: [
+  //         Container(
+  //             alignment: Alignment.topCenter,
+  //             child: Text("Add new address",
+  //                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300))),
+  //         Positioned(
+  //           right: 0,
+  //           top: 0,
+  //           child: InkWell(
+  //               onTap: () => Navigator.of(context).pop(),
+  //               child: Icon(
+  //                 Icons.close_rounded,
+  //                 size: 25,
+  //                 color: Colors.black,
+  //               )),
+  //         )
+  //       ]),
+  //       Container(
+  //         padding: EdgeInsets.only(top: 20),
+  //         height: (_size.getHeight * 0.6) - 100,
+  //         child: SingleChildScrollView(
+  //           child: Form(
+  //             key: globalKey,
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 MyTextField(
+  //                     labelText: "Title",
+  //                     maxLength: 10,
+  //                     controller: titleCtl,
+  //                     parentState: setModalState,
+  //                     validator: (value) {
+  //                       if (value.toString().trim().isEmpty) {
+  //                         setModalState(() => titleError = "enter a title");
+  //                       }
+  //                     }),
+  //                 if (titleError.isNotEmpty) error(titleError),
+  //                 MyTextField(
+  //                     labelText: "Name",
+  //                     maxLength: 20,
+  //                     controller: nameCtl,
+  //                     parentState: setModalState,
+  //                     validator: (value) {
+  //                       if (value.toString().trim().isEmpty) {
+  //                         setModalState(() => nameError = "enter a name");
+  //                       }
+  //                     }),
+  //                 if (nameError.isNotEmpty) error(nameError),
+  //                 MyTextField(
+  //                     labelText: "Address",
+  //                     controller: addressCtl,
+  //                     parentState: setModalState,
+  //                     validator: (value) {
+  //                       if (value.toString().trim().length < 10) {
+  //                         setModalState(() => addressError =
+  //                             "address must be at least 10 char.");
+  //                       }
+  //                     }),
+  //                 if (addressError.isNotEmpty) error(addressError),
+  //                 MyTextField(
+  //                     labelText: "Phone number",
+  //                     type: TextInputType.phone,
+  //                     controller: phoneCtl,
+  //                     parentState: setModalState,
+  //                     validator: (value) {
+  //                       if (!Validations.validatePhone(phone: value)) {
+  //                         setModalState(
+  //                             () => phoneError = "Invalid phone number");
+  //                       }
+  //                     },
+  //                     maxLength: 11,
+  //                     prefex: Text("+2 ", style: TextStyle(fontSize: 14))),
+  //                 if (phoneError.isNotEmpty) error(phoneError),
+  //                 SizedBox(
+  //                   height: 20,
+  //                 ),
+  //                 Row(children: [
+  //                   SizedBox(
+  //                       width: (_size.getWidth - 40) / 2,
+  //                       height: _size.getProportionateScreenHeight(60),
+  //                       child: TextButton(
+  //                           onPressed: () {
+  //                             zeroError();
+  //                             Navigator.of(context).pop();
+  //                           },
+  //                           child: Text("Cancel",
+  //                               style: TextStyle(fontSize: 17)))),
+  //                   SizedBox(
+  //                     width: (_size.getWidth - 40) / 2,
+  //                     height: _size.getProportionateScreenHeight(50),
+  //                     child: loading
+  //                         ? Center(child: CircularProgressIndicator())
+  //                         : ElevatedButton(
+  //                             style: ButtonStyle(
+  //                                 backgroundColor:
+  //                                     MaterialStateProperty.all(myPrimaryColor),
+  //                                 shape: MaterialStateProperty.all(
+  //                                     RoundedRectangleBorder(
+  //                                         borderRadius:
+  //                                             BorderRadius.circular(10)))),
+  //                             onPressed: () {
+  //                               // setState(() => loading = true);
+  //                               loading = true;
+  //                               setModalState(() {
+  //                                 if (validateForm()) {
+  //                                   addressProvider.addAddress(
+  //                                       title: titleCtl.text,
+  //                                       address: addressCtl.text,
+  //                                       name: nameCtl.text,
+  //                                       phoneNum: phoneCtl.text);
+  //                                   Navigator.of(context).pop();
+  //                                   zeroError();
+  //                                   setState(() {});
+  //                                 }
+  //                                 loading = false;
+  //                               });
+  //                             },
+  //                             child: Text(
+  //                               "Add",
+  //                               style: TextStyle(fontSize: 17),
+  //                             )),
+  //                   )
+  //                 ]),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ]),
+  //   );
+  // }
 
-  bool validateForm() {
-    titleError = "";
-    nameError = "";
-    addressError = "";
-    phoneError = "";
-    globalKey.currentState?.validate();
-    if (titleError == "" &&
-        nameError == "" &&
-        addressError == "" &&
-        phoneError == "") {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  // bool validateForm() {
+  //   titleError = "";
+  //   nameError = "";
+  //   addressError = "";
+  //   phoneError = "";
+  //   globalKey.currentState?.validate();
+  //   if (titleError == "" &&
+  //       nameError == "" &&
+  //       addressError == "" &&
+  //       phoneError == "") {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 
-  void zeroError() {
-    titleError = "";
-    nameError = "";
-    addressError = "";
-    phoneError = "";
-    titleCtl.text = "";
-    nameCtl.text = "";
-    addressCtl.text = "";
-    phoneCtl.text = "";
-  }
+  // void zeroError() {
+  //   titleError = "";
+  //   nameError = "";
+  //   addressError = "";
+  //   phoneError = "";
+  //   titleCtl.text = "";
+  //   nameCtl.text = "";
+  //   addressCtl.text = "";
+  //   phoneCtl.text = "";
+  // }
 
-  Widget error(txt) {
-    return Padding(
-        padding: EdgeInsets.only(left: 15),
-        child: Text(
-          txt,
-          style: TextStyle(color: myPrimaryColor),
-        ));
-  }
+  // Widget error(txt) {
+  //   return Padding(
+  //       padding: EdgeInsets.only(left: 15),
+  //       child: Text(
+  //         txt,
+  //         style: TextStyle(color: myPrimaryColor),
+  //       ));
+  // }
 }

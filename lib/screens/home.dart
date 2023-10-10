@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/consts/constants.dart';
 import '../widgets/loading_widget.dart';
-import 'package:reshop/providers/chart/cart_provider.dart';
+import 'package:reshop/providers/cart/cart_provider.dart';
 import 'package:reshop/screens/search_screen.dart';
 import 'package:reshop/consts/size_config.dart';
 import 'package:reshop/inner_screens/home/cart_widget.dart';

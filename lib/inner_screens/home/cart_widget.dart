@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:reshop/consts/constants.dart';
 import 'package:reshop/models/product.dart';
 // import 'package:reshop/providers/auth_readwrite.dart';
-import 'package:reshop/providers/chart/cart_provider.dart';
-import 'package:reshop/providers/chart/total.dart';
+import 'package:reshop/providers/cart/cart_provider.dart';
+import 'package:reshop/providers/cart/total.dart';
 import 'package:reshop/screens/checkout.dart';
 import 'package:reshop/consts/size_config.dart';
 
@@ -27,7 +27,6 @@ class _CartWidgetState extends State<CartWidget> {
   Widget build(BuildContext context) {
     final provider = Provider.of<DummyData>(context, listen: false);
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    // final authPeadWrite = Provider.of<AuthReadWrite>(context, listen: false);
     size.init(context);
     return FutureBuilder(
         future: cartProvider.readCart(context),
