@@ -26,6 +26,7 @@ class AuthSignUp with ChangeNotifier {
     otpCtr.text = "";
     bool emailRegistered = await AuthOther.isEmailAlreadyRegistered(
         authSignin.emailCtr.text.toString());
+    print("--------->> is email registered : $emailRegistered");
     if (emailRegistered) {
       MySnackbar.showSnackBar(context,
           "Email address already registere before !", SnackBarType.fail);
@@ -34,6 +35,7 @@ class AuthSignUp with ChangeNotifier {
     }
     bool phoneRegistered = await AuthOther.isPhoneNumberAlreadyRegistered(
         phoneCtr.text.toString());
+    print("--------->> is phone registered : $phoneRegistered");
     if (phoneRegistered) {
       MySnackbar.showSnackBar(context,
           "Phone number already registere before !", SnackBarType.fail);
@@ -41,12 +43,11 @@ class AuthSignUp with ChangeNotifier {
       return;
     }
     await phoneVerification(context);
-    //
   }
 
   Future phoneVerification(BuildContext context) async {
     var loading = Provider.of<LoadingProvider>(context, listen: false);
-
+    print("----- enter verification");
     try {
       await FirebaseAuth.instance.verifyPhoneNumber(
           phoneNumber: '+2${phoneCtr.value.text}',
@@ -60,6 +61,7 @@ class AuthSignUp with ChangeNotifier {
           },
           verificationFailed: (FirebaseAuthException e) {
             MySnackbar.showSnackBar(context, e.code, SnackBarType.fail);
+            loading.changeAuthLoading(false);
           },
           timeout: const Duration(seconds: 120),
           codeAutoRetrievalTimeout: (verificationId) {});

@@ -14,7 +14,7 @@ class SizeConfig {
   }
 
   get getWidth {
-    if (orientation.name == "portrait") {
+    if (orientation == Orientation.portrait) {
       return screenWidth;
     } else {
       return screenWidth / 1.5;

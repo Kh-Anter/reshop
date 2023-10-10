@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:pinput/pinput.dart';
 import 'package:reshop/consts/constants.dart';
-import 'package:reshop/providers/authentication/auth_readwrite.dart';
+import 'package:reshop/models/address.dart';
+import 'package:reshop/providers/address_provider.dart';
 import 'package:reshop/consts/size_config.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/widgets/mytextfield.dart';
@@ -17,31 +20,49 @@ class EditOrAddAddress extends StatelessWidget {
   EditOrAddAddress({Key? key}) : super(key: key);
   static const routeName = "/AddNewAddress";
   final size = SizeConfig();
-  bool loading = false;
   var titleError = "";
   var nameError = "";
   var addressError = "";
   var phoneError = "";
+  var cominAddress;
+  var newAddress;
+  String appBartitle = "Add new address";
 
   @override
   Widget build(BuildContext context) {
-    String appBartitle = "Add new address";
-    var authReadWrite = Provider.of<AuthReadWrite>(context, listen: false);
+    var addressProvider = Provider.of<AddressProvider>(context, listen: false);
+    var arg = ModalRoute.of(context)!.settings.arguments;
+    if (arg != null) {
+      appBartitle = "Edit address";
+      cominAddress = arg as AddressModel;
+      titleCtl.setText(cominAddress.title);
+      nameCtl.setText(cominAddress.name);
+      addressCtl.setText(cominAddress.address);
+      phoneCtl.setText(cominAddress.phoneNum);
+    }
+
     return Scaffold(
-        appBar: AppBar(
-            leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: (() => Navigator.pop(context))),
-            title: Text(appBartitle,
-                style: TextStyle(color: Colors.black, fontSize: 22))),
-        body: Container(
-            height: size.getHeight,
-            width: size.getWidth,
-            padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-            child: body(authReadWrite)));
+        appBar: appbar(context, appBartitle),
+        body: WillPopScope(
+          onWillPop: () => onWillPop(context, addressProvider),
+          child: Container(
+              height: size.getHeight,
+              width: size.getWidth,
+              padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+              child: body(addressProvider)),
+        ));
   }
 
-  body(authReadWrite) {
+  AppBar appbar(BuildContext context, String appBartitle) {
+    return AppBar(
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: (() => Navigator.pop(context))),
+        title: Text(appBartitle,
+            style: TextStyle(color: Colors.black, fontSize: 22)));
+  }
+
+  Widget body(addressProvider) {
     return Container(
       padding: EdgeInsets.only(top: 20),
       height: (size.getHeight * 0.6) - 100,
@@ -87,6 +108,7 @@ class EditOrAddAddress extends StatelessWidget {
                       labelText: "Phone number",
                       type: TextInputType.phone,
                       controller: phoneCtl,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       validator: (value) {
                         if (!Validations.validatePhone(phone: value)) {
                           setState(() => phoneError = "Invalid phone number");
@@ -99,47 +121,8 @@ class EditOrAddAddress extends StatelessWidget {
                     height: 20,
                   ),
                   Row(children: [
-                    SizedBox(
-                        width: (size.getWidth - 40) / 2,
-                        height: size.getProportionateScreenHeight(60),
-                        child: TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Cancel",
-                                style: TextStyle(fontSize: 17)))),
-                    SizedBox(
-                      width: (size.getWidth - 40) / 2,
-                      height: size.getProportionateScreenHeight(50),
-                      child: loading
-                          ? Center(child: CircularProgressIndicator())
-                          : ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all(myPrimaryColor),
-                                  shape: MaterialStateProperty.all(
-                                      RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)))),
-                              onPressed: () {
-                                loading = true;
-                                if (validateForm()) {
-                                  print(
-                                      "---------validateForm is true -----------");
-                                  authReadWrite.addAddress(
-                                      title: titleCtl.text,
-                                      address: addressCtl.text,
-                                      name: nameCtl.text,
-                                      phoneNum: phoneCtl.text);
-                                  Navigator.of(context).pop();
-                                }
-                                loading = false;
-                              },
-                              child: Text(
-                                "Add",
-                                style: TextStyle(fontSize: 17),
-                              )),
-                    )
+                    cancelBtn(context),
+                    addOrSaveBtn(addressProvider, context)
                   ]),
                 ],
               ),
@@ -147,6 +130,60 @@ class EditOrAddAddress extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  SizedBox cancelBtn(BuildContext context) {
+    return SizedBox(
+        width: (size.getWidth - 40) / 2,
+        height: size.getProportionateScreenHeight(60),
+        child: TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text("Cancel", style: TextStyle(fontSize: 17))));
+  }
+
+  SizedBox addOrSaveBtn(addressProvider, BuildContext context) {
+    return SizedBox(
+      width: (size.getWidth - 40) / 2,
+      height: size.getProportionateScreenHeight(50),
+      child: ElevatedButton(
+          style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(myPrimaryColor),
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)))),
+          onPressed: () async {
+            if (validateForm()) {
+              newAddress = AddressModel(
+                  address: addressCtl.text,
+                  name: nameCtl.text,
+                  title: titleCtl.text,
+                  phoneNum: phoneCtl.text);
+              if (cominAddress == null) {
+                await addressProvider.addAddress(
+                    newAddress: newAddress, context: context);
+              } else {
+                if (cominAddress == newAddress) {
+                  return Navigator.of(context).pop();
+                } else {
+                  cominAddress.update(newAddress);
+                  await addressProvider.editAddress(
+                      // lastAddress: cominAddress,
+                      newAddress: AddressModel(
+                          title: titleCtl.text,
+                          address: addressCtl.text,
+                          name: nameCtl.text,
+                          phoneNum: phoneCtl.text),
+                      context: context);
+                }
+              }
+            }
+          },
+          child: Text(
+            cominAddress == null ? "Add" : "Save",
+            style: TextStyle(fontSize: 17),
+          )),
     );
   }
 
@@ -169,5 +206,55 @@ class EditOrAddAddress extends StatelessWidget {
         nameError == "" &&
         addressError == "" &&
         phoneError == "");
+  }
+
+  Future<bool> onWillPop(context, provider) async {
+    newAddress = AddressModel(
+        address: addressCtl.text,
+        name: nameCtl.text,
+        title: titleCtl.text,
+        phoneNum: phoneCtl.text);
+
+    // on edit on an address:
+    if (cominAddress != null) {
+      print("------------<>>> comming !=null !");
+      if (cominAddress == newAddress) {
+        return true;
+      } else {
+        print("---------------<><<><>< comming != new !");
+        return await goBackDialog(context, () async {
+          cominAddress.update(newAddress);
+          await provider
+              .editAddress(newAddress: newAddress, context: context)
+              .then((_) => Navigator.pop(context, true));
+        });
+      }
+    }
+
+    // if add a new address:
+    else if (newAddress.isEmpty()) {
+      return true;
+    } else {
+      return await goBackDialog(context, () {
+        provider.addAddress(newAddress: newAddress, context: context);
+      });
+    }
+  }
+
+  Future<bool> goBackDialog(context, Function saveAction) async {
+    print("==========>>>>>> in gobackDialog");
+    return await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text("Notic"),
+              content: Text("Ignor changes ?"),
+              actions: [
+                ElevatedButton(
+                    onPressed: () => saveAction(), child: Text("Save")),
+                TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text("ignor")),
+              ],
+            ));
   }
 }

@@ -1,8 +1,6 @@
-import 'package:fancy_shimmer_image/fancy_shimmer_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/consts/constants.dart';
-import 'package:reshop/providers/onboarding.dart';
 import 'package:reshop/providers/root_provider.dart';
 import 'package:reshop/screens/authentication/auth_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -27,26 +25,12 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     size.init(context);
     var rootp = Provider.of<RootProvider>(context, listen: false);
-    var onboarding = Provider.of<OnBoardingProvider>(context, listen: false);
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: FutureBuilder(
-              future: onboarding.init(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else {
-                  return buildSplash(onboarding, rootp);
-                }
-              }),
-        ),
-      ),
+      body: SafeArea(child: buildSplash(rootp)),
     );
   }
 
-  buildSplash(onboarding, rootp) {
+  buildSplash(rootp) {
     return StatefulBuilder(
       builder: (BuildContext context, subState) {
         return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -55,31 +39,30 @@ class _SplashScreenState extends State<SplashScreen> {
             height: size.getHeight / 2,
             child: Column(children: [
               SizedBox(
-                  height: size.getHeight / 2 - 40,
-                  child: pageView(onboarding, subState)),
+                  height: size.getHeight / 2 - 40, child: pageView(subState)),
               SizedBox(height: 20),
-              pageIndecator(onboarding, subState)
+              pageIndecator(subState)
             ]),
           ),
           Container(
             width: size.getWidth - 50,
             child: Column(children: [
-              Text(onboarding.allScreens[currentIndex].title,
+              Text(Constants.splashScreen[currentIndex]["title"]!,
                   style: TextStyle(fontSize: 22)),
-              Text(onboarding.allScreens[currentIndex].description,
+              Text(Constants.splashScreen[currentIndex]["subtitle"]!,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: mySecondTextColor)),
             ]),
           ),
           Spacer(flex: 1),
-          btn(onboarding, rootp),
+          btn(rootp),
           Spacer(flex: 1)
         ]);
       },
     );
   }
 
-  pageView(onboarding, subState) {
+  pageView(subState) {
     return SizedBox(
         height: size.getHeight / 2,
         width: double.infinity,
@@ -90,23 +73,19 @@ class _SplashScreenState extends State<SplashScreen> {
             pageViewCtrl.jumpToPage(value);
           }),
           children: List.generate(
-            onboarding.allScreens.length,
+            3,
             (index) => Padding(
               padding: const EdgeInsets.all(8.0),
-              child: FancyShimmerImage(
-                // shimmerDuration: Duration(milliseconds: 15),
-                imageUrl: onboarding.allScreens[index].imgUrl,
-                boxFit: BoxFit.contain,
-              ),
+              child: Image.asset(Constants.splashScreen[index]["image"]!),
             ),
           ),
         ));
   }
 
-  pageIndecator(onboarding, subState) {
+  pageIndecator(subState) {
     return SmoothPageIndicator(
         controller: pageViewCtrl,
-        count: onboarding.allScreens.length,
+        count: Constants.splashScreen.length,
         effect: ExpandingDotsEffect(
             dotWidth: 8,
             dotHeight: 8,
@@ -116,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen> {
             dotColor: myPrimaryLightColor));
   }
 
-  btn(onboarding, rootp) {
+  btn(rootp) {
     return SizedBox(
         width: size.getProportionateScreenWidth(170),
         height: size.getProportionateScreenHeight(60),
@@ -127,13 +106,13 @@ class _SplashScreenState extends State<SplashScreen> {
                   borderRadius: BorderRadius.circular(10))),
             ),
             child: Text(
-              currentIndex == onboarding.allScreens.length - 1
+              currentIndex == Constants.splashScreen.length - 1
                   ? "Shop now"
                   : "Next",
               style: TextStyle(fontSize: 18),
             ),
             onPressed: () {
-              if (currentIndex != onboarding.allScreens.length - 1) {
+              if (currentIndex != Constants.splashScreen.length - 1) {
                 pageViewCtrl.jumpToPage(currentIndex + 1);
               } else {
                 rootp.localWriteAboutSplash();

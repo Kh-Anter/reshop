@@ -57,6 +57,11 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    lintOptions {
+        // Enable additional lint checks
+        warning 'unchecked'
+        warning 'unsafe'
+    }
 }
 
 flutter {

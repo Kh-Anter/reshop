@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "519110917048-eghjanpp1ao4hsf8emn59n5q6p8uil9s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.reshop",
+            "certificate_hash": "3afed190fb7c7e8387cce3ba3898b924e856ac45"
+          }
+        },
+        {
           "client_id": "519110917048-ne1ut4gpdnttjjum13v86fs0ild81hic.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -30,6 +38,13 @@
             {
               "client_id": "519110917048-ne1ut4gpdnttjjum13v86fs0ild81hic.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "519110917048-11vbipvp89b4i0hmu1lleugf54k926cu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.reshop"
+              }
             }
           ]
         }

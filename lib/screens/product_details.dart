@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/consts/constants.dart';
 import 'package:reshop/models/product.dart';
-import 'package:reshop/providers/authentication/auth_readwrite.dart';
-import 'package:reshop/providers/chart/cart_provider.dart';
+import 'package:reshop/providers/address_provider.dart';
+import 'package:reshop/providers/cart/cart_provider.dart';
 import 'package:reshop/providers/favourites.dart';
 import 'package:reshop/widgets/custom_pageview.dart';
 import '../providers/dummyData.dart';
@@ -34,7 +34,7 @@ class _ProductDetailsState extends State<ProductDetails> {
   Widget build(BuildContext context) {
     size.init(context);
     // var dummyData = Provider.of<DummyData>(context);
-    authReadWrite = Provider.of<AuthReadWrite>(context);
+    authReadWrite = Provider.of<AddressProvider>(context);
     cartProvider = Provider.of<CartProvider>(context);
     isFav = widget.product.isFav;
     return Scaffold(
@@ -56,9 +56,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               style:
                   TextStyle(fontSize: 16, color: Color.fromRGBO(1, 1, 1, 0.5)),
             ),
-            SizedBox(
-              height: 15,
-            ),
+            SizedBox(height: 15),
             Row(children: [productPrice(), Spacer(), productCount()]),
             SizedBox(height: 5),
             productRate(),

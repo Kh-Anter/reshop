@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.5
   flutter_native_splash: ^2.2.9
   # pinput: ^2.2.19
-  flutter_simple_treeview: ^3.0.2
+  # flutter_simple_treeview: ^3.0.2
   http: ^0.13.5
   firebase_auth: ^4.2.1
   email_auth: ^1.0.0
@@ -48,7 +48,7 @@ dependencies:
   connectivity_plus: ^2.3.9
   shared_preferences: ^2.0.15
   google_sign_in: ^5.4.2
-  firebase_app_check: ^0.1.5+1
+  firebase_app_check: ^0.2.0+1
   flutter_facebook_auth: ^5.0.6
   badges: ^2.0.3
   flutter_gen: ^5.1.0+1
@@ -59,6 +59,7 @@ dependencies:
   flutter_spinkit: ^5.2.0
   image_picker: ^1.0.1
   firebase_storage: ^11.2.5
+  intl: ^0.18.1
 
 
 

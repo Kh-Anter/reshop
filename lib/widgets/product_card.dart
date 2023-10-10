@@ -2,7 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:reshop/providers/chart/cart_provider.dart';
+import 'package:reshop/providers/cart/cart_provider.dart';
 import 'package:reshop/providers/favourites.dart';
 import '../providers/dummyData.dart';
 import 'package:reshop/consts/constants.dart';
@@ -83,6 +83,7 @@ class _ProductCartState extends State<ProductCart> {
   }
 
   Widget addToCartBtn(cartProvider) {
+    bool isInCart = cartProvider.isInCart(widget.product.id, context);
     return Flexible(
       flex: 2,
       child: Padding(
@@ -92,14 +93,16 @@ class _ProductCartState extends State<ProductCart> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(),
             child: Text(
-              "Add To Cart",
+              isInCart ? "In Cart" : "Add To Cart",
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
                   backgroundColor: myPrimaryColor),
             ),
             onPressed: () {
-              cartProvider.addToCart(widget.product, context);
+              if (!isInCart) {
+                cartProvider.addToCart(widget.product, context);
+              }
             },
           ),
         ),

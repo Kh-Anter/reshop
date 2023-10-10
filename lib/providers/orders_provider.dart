@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:reshop/providers/chart/cart_provider.dart';
-import 'package:reshop/providers/chart/total.dart';
+import 'package:reshop/providers/cart/cart_provider.dart';
+import 'package:reshop/providers/cart/total.dart';
 import 'package:intl/intl.dart';
 
 class OrderProvider extends ChangeNotifier {
@@ -34,6 +34,7 @@ class OrderProvider extends ChangeNotifier {
       "uid": FirebaseAuth.instance.currentUser?.uid,
     }).then((value) {
       changeAddOrderProgress();
+      Provider.of<CartProvider>(ctx, listen: false).emptyingCart();
     });
   }
 
@@ -65,7 +66,6 @@ class OrderProvider extends ChangeNotifier {
         },
       );
     }
-
     return result;
   }
 }

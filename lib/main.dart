@@ -3,22 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:reshop/providers/address_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:reshop/firebase_options.dart';
-
 import './consts/constants.dart';
-import './providers/authentication/auth_readwrite.dart';
 import './providers/authentication/auth_signin.dart';
 import './providers/authentication/auth_signup.dart';
 import './providers/categories.dart';
-import './providers/chart/cart_provider.dart';
-import './providers/chart/total.dart';
+import 'providers/cart/cart_provider.dart';
+import 'providers/cart/total.dart';
 import './providers/dummyData.dart';
 import './providers/authentication/auth_other.dart';
 import './providers/favourites.dart';
 import './providers/loading_provider.dart';
-import './providers/onboarding.dart';
 import './providers/orders_provider.dart';
 import './providers/root_provider.dart';
 import './screens/authentication/auth_screen.dart';
@@ -40,14 +38,13 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => RootProvider()),
         ChangeNotifierProvider(create: (context) => DummyData()),
         ChangeNotifierProvider(create: (context) => AuthSignUp()),
-        ChangeNotifierProvider(create: (context) => AuthReadWrite()),
+        ChangeNotifierProvider(create: (context) => AddressProvider()),
         ChangeNotifierProvider(create: (context) => AuthSignIn()),
         ChangeNotifierProvider(create: (context) => AuthOther()),
         ChangeNotifierProvider(create: (context) => FavouritesProvider()),
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => TotalCartProvider()),
         ChangeNotifierProvider(create: (context) => OrderProvider()),
-        ChangeNotifierProvider(create: (context) => OnBoardingProvider()),
         ChangeNotifierProvider(create: (context) => CategoriesProvider()),
         ChangeNotifierProvider(create: (context) => LoadingProvider()),
       ],

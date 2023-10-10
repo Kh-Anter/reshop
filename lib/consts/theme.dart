@@ -37,13 +37,13 @@ TextTheme textTheme() {
 
 AppBarTheme appBarTheme() {
   return AppBarTheme(
-    color: Colors.white,
-    elevation: 0,
-    // brightness: Brightness.light,
-    iconTheme: IconThemeData(color: Colors.black),
-    // textTheme: TextTheme(
-    // headline1: TextStyle(color: mySecondTextColor),
-    // headline6: TextStyle(color: mySecondTextColor),
-    // ),
-  );
+      color: Colors.white,
+      elevation: 0,
+      // brightness: Brightness.light,
+      iconTheme: IconThemeData(color: Colors.black)
+      // textTheme: TextTheme(
+      // headline1: TextStyle(color: mySecondTextColor),
+      // headline6: TextStyle(color: mySecondTextColor),
+      // ),
+      );
 }
